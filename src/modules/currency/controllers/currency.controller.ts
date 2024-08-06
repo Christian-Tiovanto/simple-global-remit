@@ -24,6 +24,9 @@ export class CurrencyController {
     @Body() conversionValueDto: ConversionValueDto,
     @Param('signature') signature: string,
   ) {
+    console.log('signature');
+    console.log(conversionValueDto);
+    console.log(signature);
     return await this.currencyService.getConversionValue(signature, conversionValueDto);
   }
 }
