@@ -2,17 +2,22 @@ export interface JsonApiValidationError {
   status: string;
   source: string[];
   title: string;
-  detail: JsonApiValidationErrorDetail;
+  value: Record<string, any>;
 }
 
 export interface JsonApiConflictError {
   status: string;
-  source: string;
+  source: string | string[];
   title: string;
-  value?: string;
-  detail?: JsonApiValidationErrorDetail;
+  value: string;
 }
-export interface JsonApiValidationErrorDetail {
-  type: string;
-  context?: Record<string, any>;
+
+export interface JsonApiDetailConflictError {
+  value: string;
+  key: string;
+}
+
+export interface JsonApiDetailValidationError {
+  value: Record<string, any>;
+  key: string[];
 }

@@ -8,5 +8,5 @@ export abstract class BaseValidationException extends Error {
 }
 
 export abstract class BaseConflictException extends Error {
-  public abstract errors: JsonApiConflictError[];
+  public abstract errors: JsonApiConflictError;
 }

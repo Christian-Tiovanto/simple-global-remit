@@ -15,7 +15,7 @@ export class DataValidationPipe implements PipeTransform {
       const errorsValue = errors.map((error) => {
         return error.constraints;
       });
-      throw new ValidationError('Validation Error', errorsKey, errorsValue);
+      throw new ValidationError('Validation Error', { key: errorsKey, value: errorsValue });
     }
     return value;
   }
