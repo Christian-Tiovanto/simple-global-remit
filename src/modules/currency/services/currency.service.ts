@@ -13,14 +13,7 @@ export class CurrencyService {
   ) {}
 
   async createCurrency(createCurrencyDto: CreateCurrencyDto) {
-    const isCurrencyExist = await this.currencyRepository.findOne({
-      where: { currency_signature: createCurrencyDto.currency_signature },
-    });
-    if (isCurrencyExist)
-      throw new DuplicateCurrencyException('Duplicate Currency', {
-        key: 'currency_signature',
-        value: createCurrencyDto.currency_signature,
-      });
+    await this.isCurrencyExist(createCurrencyDto.currency_signature);
     const currency = await this.currencyRepository.create(createCurrencyDto);
     await this.currencyRepository.save(currency);
     return currency;
@@ -29,5 +22,16 @@ export class CurrencyService {
   async getAllCurrency() {
     const currencys = await this.currencyRepository.find();
     return currencys;
+  }
+
+  private async isCurrencyExist(currency_signature: string) {
+    const isCurrencyExist = await this.currencyRepository.findOne({
+      where: { currency_signature: currency_signature },
+    });
+    if (isCurrencyExist)
+      throw new DuplicateCurrencyException('Duplicate Currency', {
+        key: 'currency_signature',
+        value: currency_signature,
+      });
   }
 }
