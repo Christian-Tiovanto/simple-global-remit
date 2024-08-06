@@ -6,6 +6,10 @@ import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { DataValidationPipe } from './pipes/validation.pipe';
 import { HttpExceptionFilter } from './filters/exception-handler.filter';
 import { Currency } from './modules/currency/models/currency.entity';
+import { UserModule } from './modules/user/user.module';
+import { User } from './modules/user/models/user.entity';
+import { TransactionModule } from './modules/transactions/transaction.module';
+import { Transaction } from './modules/transactions/models/transactions.entity';
 
 @Module({
   providers: [
@@ -21,10 +25,12 @@ import { Currency } from './modules/currency/models/currency.entity';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [Currency],
+      entities: [Currency, User, Transaction],
       synchronize: true,
     }),
     CurrencyModule,
+    UserModule,
+    TransactionModule,
   ],
 })
 export class AppModule {}

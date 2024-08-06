@@ -1,0 +1,3 @@
+export enum ErrorCode {
+  POSTGRES_UNIQUE_VIOLATION_ERROR_CODE = '23505',
+}
