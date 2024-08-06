@@ -1,4 +1,11 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  ExceptionFilter,
+  Catch,
+  ArgumentsHost,
+  HttpException,
+  HttpStatus,
+  BadRequestException,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { BaseConflictException, BaseValidationException } from 'src/exceptions/base.exception';
 
@@ -20,6 +27,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
           error: exception.errors,
         });
         break;
+      case exception instanceof BadRequestException:
+        response.status(HttpStatus.BAD_REQUEST);
+        this.toJson(exception, response);
+        break;
       default:
         response.status(HttpStatus.INTERNAL_SERVER_ERROR);
         response.json({
@@ -27,5 +38,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
           errors: exception.stack,
         });
     }
+  }
+
+  private toJson(exception: Error, res: Response): void {
+    res.json({
+      name: exception.constructor.name || 'Error',
+      message: exception.message,
+    });
   }
 }
