@@ -36,8 +36,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
   private toJson(exception: Error, res: Response): void {
     res.json({
-      name: exception.constructor.name || 'Error',
-      message: exception.message,
+      error: {
+        name: exception.constructor.name || 'Error',
+        message: exception.message,
+      },
     });
   }
 }

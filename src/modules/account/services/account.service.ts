@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Account } from '../models/account.entity';
 import { QueryFailedError, Repository } from 'typeorm';
@@ -12,7 +12,7 @@ export class AccountService {
 
   async createAccount(createAccountDto: CreateAccountDto) {
     try {
-      const account = this.accountRepository.create(createAccountDto);
+      const account = await this.accountRepository.create(createAccountDto);
       await this.accountRepository.save(account);
       return account;
     } catch (err) {
@@ -23,5 +23,11 @@ export class AccountService {
         });
       }
     }
+  }
+
+  async getUserAccount(accountNumber: number) {
+    const account = await this.accountRepository.findOne({ where: { accountNumber } });
+    if (!account) throw new BadRequestException('There is no account with that number');
+    return account;
   }
 }

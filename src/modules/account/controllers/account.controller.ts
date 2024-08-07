@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 import { AccountService } from '../services/account.service';
 import { CreateAccountDto } from '../dtos/create-account.dto';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
@@ -10,5 +10,11 @@ export class AccountController {
   @Post()
   async createAccount(@Body() createAccountDto: CreateAccountDto) {
     return await this.accountService.createAccount(createAccountDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':account')
+  async getUserAccount(@Param('account', ParseIntPipe) number: number) {
+    return await this.accountService.getUserAccount(number);
   }
 }
