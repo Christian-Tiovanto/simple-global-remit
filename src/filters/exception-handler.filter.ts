@@ -1,11 +1,4 @@
-import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  HttpException,
-  HttpStatus,
-  BadRequestException,
-} from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus, BadRequestException } from '@nestjs/common';
 import { Response } from 'express';
 import { BaseConflictException, BaseValidationException } from 'src/exceptions/base.exception';
 
@@ -32,6 +25,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         this.toJson(exception, response);
         break;
       default:
+        // console.log(exception);
         response.status(HttpStatus.INTERNAL_SERVER_ERROR);
         response.json({
           message: 'something went wrong',

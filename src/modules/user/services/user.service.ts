@@ -22,15 +22,8 @@ export class UserService {
       user.password = '';
       return plainToInstance(User, user);
     } catch (err) {
-      if (
-        err instanceof QueryFailedError &&
-        err.driverError.code === ErrorCode.POSTGRES_UNIQUE_VIOLATION_ERROR_CODE
-      ) {
-        throw new DuplicateEmailException(
-          `${userDto.email} already register`,
-          'email',
-          userDto.email,
-        );
+      if (err instanceof QueryFailedError && err.driverError.code === ErrorCode.POSTGRES_UNIQUE_VIOLATION_ERROR_CODE) {
+        throw new DuplicateEmailException(`${userDto.email} already register`, { key: 'email', value: userDto.email });
       }
       throw err;
     }

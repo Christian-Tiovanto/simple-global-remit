@@ -1,11 +1,9 @@
-import { Body, Controller, Get, Param, Post, Query, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { CurrencyService } from '../services/currency.service';
 import { CreateCurrencyDto } from '../dtos/create-currency.dto';
-import { ResponseFormatInterceptor } from 'src/interceptors/response-format.interceptor';
 import { ConversionValueQuery } from '../classes/currency.class';
 
 @Controller('api/v1/currency')
-@UseInterceptors(ResponseFormatInterceptor)
 export class CurrencyController {
   constructor(private readonly currencyService: CurrencyService) {}
 
@@ -20,10 +18,7 @@ export class CurrencyController {
   }
 
   @Get(':signature')
-  async getConversionValue(
-    @Param('signature') signature: string,
-    @Query() conversionValueQuery: ConversionValueQuery,
-  ) {
+  async getConversionValue(@Param('signature') signature: string, @Query() conversionValueQuery: ConversionValueQuery) {
     return await this.currencyService.getConversionValue(signature, conversionValueQuery);
   }
 }

@@ -2,7 +2,7 @@ import { JsonApiConflictError, JsonApiDetailConflictError } from 'src/interfaces
 import { BaseConflictException } from './base.exception';
 import { HttpStatus } from '@nestjs/common';
 
-export class DuplicateCurrencyException extends BaseConflictException {
+export class DuplicateAccountException extends BaseConflictException {
   public errors: JsonApiConflictError;
   constructor(message: string, detail: JsonApiDetailConflictError) {
     super(message);
@@ -11,7 +11,7 @@ export class DuplicateCurrencyException extends BaseConflictException {
       source: detail.key,
       status: HttpStatus.CONFLICT.toString(),
       value: detail.value,
-      type: 'Currency Signature Duplicate',
+      type: 'Account Number Duplicate',
     };
   }
 }

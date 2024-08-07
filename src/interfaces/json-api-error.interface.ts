@@ -3,6 +3,7 @@ export interface JsonApiValidationError {
   source: string[];
   title: string;
   value: Record<string, any>;
+  type: string;
 }
 
 export interface JsonApiConflictError {
@@ -10,6 +11,7 @@ export interface JsonApiConflictError {
   source: string | string[];
   title: string;
   value: string;
+  type: string;
 }
 
 export interface JsonApiDetailConflictError {
