@@ -1,7 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
-import { Transaction } from 'src/modules/transactions/models/transactions.entity';
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -27,10 +26,4 @@ export class User {
   @Exclude()
   @Column()
   password: string;
-
-  @OneToMany(() => Transaction, (transaction) => transaction.toUser)
-  sentTransactions: Transaction[];
-
-  @OneToMany(() => Transaction, (transaction) => transaction.fromUser)
-  fromTransactions: Transaction[];
 }
