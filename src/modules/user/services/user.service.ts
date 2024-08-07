@@ -31,12 +31,16 @@ export class UserService {
 
   async getAllUser(): Promise<User[]> {
     const users = await this.usersRepository.find();
-
     return plainToInstance(User, users);
   }
 
   async getUserbyEmail(email: string): Promise<User> | undefined {
     const user = await this.usersRepository.findOne({ where: { email } });
+    return user;
+  }
+
+  async getUserbyId(id: number): Promise<User> | undefined {
+    const user = await this.usersRepository.findOne({ where: { id } });
     return user;
   }
 }
