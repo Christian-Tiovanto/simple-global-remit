@@ -1,9 +1,7 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards, UseInterceptors, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { CreateUserDto } from '../dtos/create-user.dto';
-import { ResponseFormatInterceptor } from 'src/interceptors/response-format.interceptor';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
-import { DataValidationPipe } from 'src/pipes/validation.pipe';
 
 @Controller('api/v1/user')
 export class UserController {

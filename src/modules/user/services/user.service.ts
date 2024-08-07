@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, QueryFailedError, Repository } from 'typeorm';
 import { User } from '../models/user.entity';
@@ -18,8 +18,7 @@ export class UserService {
     try {
       const user = await this.usersRepository.create(userDto);
       await this.usersRepository.save(user);
-      if (!user.id) throw new HttpException('User Create Failed', HttpStatus.BAD_REQUEST);
-      user.password = '';
+      if (!user.id) throw new BadRequestException('User Create Failed');
       return plainToInstance(User, user);
     } catch (err) {
       if (err instanceof QueryFailedError && err.driverError.code === ErrorCode.POSTGRES_UNIQUE_VIOLATION_ERROR_CODE) {

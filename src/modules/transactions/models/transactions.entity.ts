@@ -1,13 +1,22 @@
 import { Account } from 'src/modules/account/models/account.entity';
 import { User } from 'src/modules/user/models/user.entity';
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class Transaction {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, { cascade: ['soft-remove'] })
   @JoinColumn()
   user: User;
 
@@ -25,4 +34,7 @@ export class Transaction {
 
   @CreateDateColumn()
   timeStamp: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 }

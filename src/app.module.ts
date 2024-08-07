@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CurrencyModule } from './modules/currency/currency.module';
-import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { DataValidationPipe } from './pipes/validation.pipe';
 import { HttpExceptionFilter } from './filters/exception-handler.filter';
 import { Currency } from './modules/currency/models/currency.entity';
