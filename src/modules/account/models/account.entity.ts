@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from 'src/modules/user/models/user.entity';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Account {
@@ -10,4 +11,8 @@ export class Account {
 
   @Column()
   balance: number;
+
+  @OneToOne(() => User, { nullable: false })
+  @JoinColumn()
+  user: User;
 }
