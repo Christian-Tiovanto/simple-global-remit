@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { QueryFailedError, Repository } from 'typeorm';
+import { In, QueryFailedError, Repository } from 'typeorm';
 import { User } from '../models/user.entity';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { ErrorCode } from 'src/enums/error-code';
@@ -42,5 +42,10 @@ export class UserService {
   async getUserbyId(id: number): Promise<User> | undefined {
     const user = await this.usersRepository.findOne({ where: { id } });
     return user;
+  }
+
+  async getUsersbyId(idList: number[]): Promise<User[]> | undefined {
+    const users = await this.usersRepository.find({ where: { id: In(idList) } });
+    return users;
   }
 }
