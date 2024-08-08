@@ -20,19 +20,12 @@ export class TransactionService {
   }
   async createTransaction(createTransactionQuery: CreateTransactionQuery, userId: number) {
     const amount = await this.transactionRepository.manager.transaction(async (entityManager: EntityManager) => {
-      const amount = (
-        await this.currencyService.getConversionValue(createTransactionQuery.currency, {
-          amount: createTransactionQuery.amount,
-          reverse: false,
-        })
-      ).toFixed(2);
-      const formattedAmount = Number(amount);
-      const userAccount = await this.accountService.getUserAccountWithManager(entityManager, userId);
-      const receiverAccount = await this.accountService.getAccountByNumberWithManager(
+      const formattedAmount = await this.calculateFormattedAmount(createTransactionQuery);
+      const { userAccount, receiverAccount } = await this.getAccountForTransaction(
         entityManager,
+        userId,
         createTransactionQuery['receiver-account'],
       );
-      if (userAccount.id === receiverAccount.id) throw new BadRequestException('Cannot send money to your own account');
       await this.accountService.updateUserAndReceiverBalanceWithManager(
         entityManager,
         { userAccount, receiverAccount },
@@ -49,5 +42,23 @@ export class TransactionService {
       return formattedAmount;
     });
     return amount;
+  }
+
+  private async calculateFormattedAmount(createTransactionQuery: CreateTransactionQuery): Promise<number> {
+    const conversionValue = await this.currencyService.getConversionValue(createTransactionQuery.currency, {
+      amount: createTransactionQuery.amount,
+      reverse: false,
+    });
+    return Number(conversionValue.toFixed(2));
+  }
+  private async getAccountForTransaction(
+    entityManager: EntityManager,
+    senderId: number,
+    receiverNumber: CreateTransactionQuery['receiver-account'],
+  ) {
+    const userAccount = await this.accountService.getUserAccountWithManager(entityManager, senderId);
+    const receiverAccount = await this.accountService.getAccountByNumberWithManager(entityManager, receiverNumber);
+    if (userAccount.id === receiverAccount.id) throw new BadRequestException('Cannot send money to your own account');
+    return { userAccount, receiverAccount };
   }
 }
