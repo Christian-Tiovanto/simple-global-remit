@@ -7,7 +7,6 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -16,17 +15,19 @@ export class Transaction {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => User, { cascade: ['soft-remove'] })
+  @ManyToOne(() => User, { cascade: ['soft-remove'] })
   @JoinColumn()
   user: User;
 
-  @ManyToOne(() => Account)
+  @ManyToOne(() => Account, (account) => account.accountNumber)
+  @JoinColumn({ referencedColumnName: 'accountNumber', name: 'fromAccountNumber' })
   fromAccount: Account;
 
-  @ManyToOne(() => Account)
+  @ManyToOne(() => Account, (account) => account.accountNumber)
+  @JoinColumn({ referencedColumnName: 'accountNumber', name: 'toAccountNumber' })
   toAccount: Account;
 
-  @Column()
+  @Column({ type: 'double precision' })
   totalAmount: number;
 
   @Column()
