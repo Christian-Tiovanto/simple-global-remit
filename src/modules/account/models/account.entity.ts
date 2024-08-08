@@ -9,7 +9,7 @@ export class Account {
   @Column({ unique: true })
   accountNumber: number;
 
-  @Column({ type: 'double precision', scale: 2 })
+  @Column({ type: 'double precision' })
   balance: number;
 
   @OneToOne(() => User, { nullable: false })
