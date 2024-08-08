@@ -11,7 +11,6 @@ export class ResponseFormatInterceptor<T> implements NestInterceptor<T, Response
   intercept(context: ExecutionContext, next: CallHandler): Observable<Response<T>> {
     return next.handle().pipe(
       map((data) => {
-        console.log(data);
         return { data };
       }),
     );

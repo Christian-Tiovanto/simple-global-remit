@@ -25,7 +25,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         this.toJson(exception, response);
         break;
       default:
-        // console.log(exception);
+        console.log(exception);
         response.status(HttpStatus.INTERNAL_SERVER_ERROR);
         response.json({
           message: 'something went wrong',
