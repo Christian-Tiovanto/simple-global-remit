@@ -1,13 +1,14 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Account } from '../models/account.entity';
-import { QueryFailedError, Repository } from 'typeorm';
+import { EntityManager, QueryFailedError, Repository } from 'typeorm';
 import { CreateAccountDto } from '../dtos/create-account.dto';
 import { ErrorCode } from 'src/enums/error-code';
 import { DuplicateAccountException } from 'src/exceptions/duplicate-account.exception';
 import { UserService } from 'src/modules/user/services/user.service';
 import { plainToInstance } from 'class-transformer';
 import { User } from 'src/modules/user/models/user.entity';
+import { AccountListTransaction } from 'src/interfaces/account-list-transaction';
 
 @Injectable()
 export class AccountService {
@@ -50,10 +51,39 @@ export class AccountService {
       }
     }
   }
+  async getUserAccount(id: number) {
+    const account = await this.accountRepository.findOne({ where: { user: { id } } });
+    if (!account) throw new BadRequestException('this user doesnt have an account yet');
+    return account;
+  }
 
-  async getUserAccount(accountNumber: number) {
+  async getAccountByNumber(accountNumber: number) {
     const account = await this.accountRepository.findOne({ where: { accountNumber } });
     if (!account) throw new BadRequestException('There is no account with that number');
     return account;
+  }
+
+  async getUserAccountWithManager(entityManager: EntityManager, id: number) {
+    const account = await entityManager.findOne(Account, { where: { user: { id } } });
+    if (!account) throw new BadRequestException('this user doesnt have an account yet');
+    return account;
+  }
+
+  async getAccountByNumberWithManager(entityManager: EntityManager, accountNumber: number) {
+    const account = await entityManager.findOne(Account, { where: { accountNumber } });
+    return account;
+  }
+
+  async updateUserAndReceiverBalanceWithManager(
+    entityManager: EntityManager,
+    accountList: AccountListTransaction,
+    amount: number,
+  ) {
+    accountList.userAccount.balance -= amount;
+    if (accountList.userAccount.balance < 0)
+      throw new BadRequestException('you dont have enough money in your account');
+    accountList.receiverAccount.balance += amount;
+    await entityManager.save(accountList.userAccount);
+    await entityManager.save(accountList.receiverAccount);
   }
 }
