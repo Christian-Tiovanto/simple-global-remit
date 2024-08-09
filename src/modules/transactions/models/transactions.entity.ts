@@ -1,4 +1,5 @@
 import { Account } from 'src/modules/account/models/account.entity';
+import { Currency } from 'src/modules/currency/models/currency.entity';
 import { User } from 'src/modules/user/models/user.entity';
 import {
   Column,
@@ -23,15 +24,15 @@ export class Transaction {
   @JoinColumn({ referencedColumnName: 'accountNumber', name: 'fromAccountNumber' })
   fromAccount: Account;
 
-  @ManyToOne(() => Account, (account) => account.accountNumber)
+  @ManyToOne(() => Account, (account) => account.balance)
   @JoinColumn({ referencedColumnName: 'accountNumber', name: 'toAccountNumber' })
   toAccount: Account;
 
   @Column({ type: 'double precision' })
   totalAmount: number;
 
-  @Column()
-  currency: string;
+  @ManyToOne(() => Currency, (currency) => currency.currency_signature)
+  currency: Currency;
 
   @CreateDateColumn()
   timeStamp: Date;

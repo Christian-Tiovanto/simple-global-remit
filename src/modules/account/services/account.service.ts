@@ -7,6 +7,7 @@ import { ErrorCode } from 'src/enums/error-code';
 import { DuplicateAccountException } from 'src/exceptions/duplicate-account.exception';
 import { UserService } from 'src/modules/user/services/user.service';
 import { AccountListTransaction } from 'src/interfaces/account-list-transaction';
+import { TransactionAmountUpdate } from 'src/interfaces/transaction-amount-update';
 
 @Injectable()
 export class AccountService {
@@ -88,19 +89,20 @@ export class AccountService {
   }
 
   async getAccountByNumberWithManager(entityManager: EntityManager, accountNumber: number) {
-    const account = await entityManager.findOne(Account, { where: { accountNumber } });
+    const account = await entityManager.findOne(Account, { where: { accountNumber }, relations: { currency: true } });
+    if (!account) throw new BadRequestException('there is no account with that number');
     return account;
   }
 
   async updateUserAndReceiverBalanceWithManager(
     entityManager: EntityManager,
     accountList: AccountListTransaction,
-    amount: number,
+    amount: TransactionAmountUpdate,
   ) {
-    accountList.userAccount.balance -= amount;
+    accountList.userAccount.balance -= amount.subtractUserAccount;
     if (accountList.userAccount.balance < 0)
       throw new BadRequestException('you dont have enough money in your account');
-    accountList.receiverAccount.balance += amount;
+    accountList.receiverAccount.balance += amount.addReceiverAccount;
     await entityManager.save(accountList.userAccount);
     await entityManager.save(accountList.receiverAccount);
   }

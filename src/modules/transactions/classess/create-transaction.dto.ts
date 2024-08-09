@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsNumber, IsString } from 'class-validator';
+import { IsNumber } from 'class-validator';
 import { parseNumber } from 'src/utils/parse-number-transform';
 
 export class CreateTransactionQuery {
@@ -10,7 +10,4 @@ export class CreateTransactionQuery {
   @Transform(parseNumber)
   @IsNumber()
   amount: number;
-
-  @IsString()
-  currency: string;
 }
