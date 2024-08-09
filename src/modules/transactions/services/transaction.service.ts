@@ -5,6 +5,7 @@ import { EntityManager, Repository } from 'typeorm';
 import { CreateTransactionQuery } from '../classess/create-transaction.dto';
 import { AccountService } from 'src/modules/account/services/account.service';
 import { CurrencyService } from 'src/modules/currency/services/currency.service';
+import { Currency } from 'src/modules/currency/models/currency.entity';
 
 @Injectable()
 export class TransactionService {
@@ -20,23 +21,26 @@ export class TransactionService {
   }
   async createTransaction(createTransactionQuery: CreateTransactionQuery, userId: number) {
     const amount = await this.transactionRepository.manager.transaction(async (entityManager: EntityManager) => {
-      const formattedAmount = await this.calculateFormattedAmount(createTransactionQuery);
       const { userAccount, receiverAccount } = await this.getAccountForTransaction(
         entityManager,
         userId,
         createTransactionQuery['receiver-account'],
       );
+      const formattedAmount = await this.calculateFormattedAmount(
+        receiverAccount.currency.currency_signature,
+        createTransactionQuery.amount,
+      );
       await this.accountService.updateUserAndReceiverBalanceWithManager(
         entityManager,
         { userAccount, receiverAccount },
-        formattedAmount,
+        { subtractUserAccount: createTransactionQuery.amount, addReceiverAccount: formattedAmount },
       );
       const transaction = await entityManager.create(Transaction, {
         fromAccount: userAccount,
         toAccount: receiverAccount,
         user: { id: userId },
         totalAmount: formattedAmount,
-        currency: createTransactionQuery.currency,
+        currency: receiverAccount.currency,
       });
       await entityManager.save(transaction);
       return formattedAmount;
@@ -44,9 +48,12 @@ export class TransactionService {
     return amount;
   }
 
-  private async calculateFormattedAmount(createTransactionQuery: CreateTransactionQuery): Promise<number> {
-    const conversionValue = await this.currencyService.getConversionValue(createTransactionQuery.currency, {
-      amount: createTransactionQuery.amount,
+  private async calculateFormattedAmount(
+    receiverAccountCurrency: Currency['currency_signature'],
+    amount: CreateTransactionQuery['amount'],
+  ): Promise<number> {
+    const conversionValue = await this.currencyService.getConversionValue(receiverAccountCurrency, {
+      amount: amount,
       reverse: false,
     });
     return Number(conversionValue.toFixed(2));
