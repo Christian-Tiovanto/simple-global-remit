@@ -1,5 +1,6 @@
+import { Currency } from 'src/modules/currency/models/currency.entity';
 import { User } from 'src/modules/user/models/user.entity';
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Account {
@@ -11,6 +12,10 @@ export class Account {
 
   @Column({ type: 'double precision' })
   balance: number;
+
+  @ManyToOne(() => Currency, { nullable: false })
+  @JoinColumn({ name: 'currency_signature' })
+  currency: Currency;
 
   @OneToOne(() => User, { nullable: false })
   @JoinColumn()
