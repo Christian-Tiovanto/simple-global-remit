@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Currency } from '../models/currency.entity';
-import { EntityManager, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateCurrencyDto } from '../dtos/create-currency.dto';
 import { DuplicateCurrencyException } from 'src/exceptions/duplicate-currency.exception';
 import { ConversionValueQuery } from '../classes/currency.class';
@@ -14,7 +14,14 @@ export class CurrencyService {
   ) {}
 
   async createCurrency(createCurrencyDto: CreateCurrencyDto) {
-    await this.getCurrencyAndCheckExist(createCurrencyDto.currency_signature, true);
+    const isCurrency = await this.getCurrency(createCurrencyDto.currency_signature);
+    if (isCurrency)
+      throw new DuplicateCurrencyException('Duplicate Currency', {
+        key: 'currency_signature',
+
+        value: createCurrencyDto.currency_signature,
+      });
+
     const currency = await this.currencyRepository.create(createCurrencyDto);
     await this.currencyRepository.save(currency);
     return currency;
@@ -26,7 +33,9 @@ export class CurrencyService {
   }
 
   async getConversionValue(currency_signature: string, conversionValueQuery: ConversionValueQuery) {
-    const currency = await this.getCurrencyAndCheckExist(currency_signature, false);
+    const currency = await this.getCurrency(currency_signature);
+    if (!currency) throw new BadRequestException('There is no Currency with that signature');
+
     let convertedValue;
     if (conversionValueQuery.reverse) {
       return (convertedValue = currency.conversion_rate_to_idr * conversionValueQuery.amount);
@@ -35,39 +44,11 @@ export class CurrencyService {
     return (convertedValue = conversionValueQuery.amount / currency.conversion_rate_to_idr);
   }
 
-  async getCurrencyAndCheckExist(currency_signature: string, createOption: boolean) {
+  async getCurrency(currency_signature: string) {
     const currency = await this.currencyRepository.findOne({
       where: { currency_signature: currency_signature },
     });
 
-    if (createOption && currency) {
-      throw new DuplicateCurrencyException('Duplicate Currency', {
-        key: 'currency_signature',
-        value: currency_signature,
-      });
-    } else if (!currency) {
-      throw new BadRequestException('There is no Currency with that signature');
-    }
-    return currency;
-  }
-
-  async getCurrencyAndCheckExistWithManager(
-    entityManager: EntityManager,
-    currency_signature: string,
-    createOption: boolean,
-  ) {
-    const currency = await entityManager.findOne(Currency, {
-      where: { currency_signature: currency_signature },
-    });
-
-    if (createOption && currency) {
-      throw new DuplicateCurrencyException('Duplicate Currency', {
-        key: 'currency_signature',
-        value: currency_signature,
-      });
-    } else if (!currency) {
-      throw new BadRequestException('There is no Currency with that signature');
-    }
     return currency;
   }
 }
