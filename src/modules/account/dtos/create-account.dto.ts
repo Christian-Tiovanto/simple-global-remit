@@ -1,4 +1,4 @@
-import { IsNumber } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class CreateAccountDto {
   @IsNumber()
@@ -9,4 +9,7 @@ export class CreateAccountDto {
 
   @IsNumber()
   userId: number;
+
+  @IsString()
+  currency: string;
 }
