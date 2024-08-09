@@ -1,18 +1,28 @@
 import { Currency } from 'src/modules/currency/models/currency.entity';
-import { CreateDateColumn, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity()
 export class ExchangeRate {
-  @ManyToOne(() => Currency)
-  @JoinColumn({ name: 'fromCurrency' })
+  @PrimaryColumn({ type: 'varchar' })
+  fromCurrencyCode: string;
+
+  @PrimaryColumn({ type: 'varchar' })
+  toCurrencyCode: string;
+
+  @ManyToOne(() => Currency, { nullable: false })
+  @JoinColumn({ name: 'fromCurrencyCode' })
   fromCurrency: Currency;
 
-  @ManyToOne(() => Currency)
-  @JoinColumn({ name: 'toCurrency' })
+  @ManyToOne(() => Currency, { nullable: false })
+  @JoinColumn({ name: 'toCurrencyCode' })
   toCurrency: Currency;
 
-  exhangerate: number;
+  @UpdateDateColumn()
+  updatedAt: Date;
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @Column()
+  exchangeRate: number;
 }

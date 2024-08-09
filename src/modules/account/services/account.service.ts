@@ -18,6 +18,8 @@ export class AccountService {
 
   async createAccount(createAccountDto: CreateAccountDto) {
     try {
+      if (createAccountDto.currency.length != 3)
+        throw new BadRequestException('Currency Signature must be 3 character');
       const account = await this.accountRepository.create({
         ...createAccountDto,
         user: { id: createAccountDto.userId },
@@ -49,7 +51,7 @@ export class AccountService {
       err.driverError.code === ErrorCode.POSTGRES_UNIQUE_VIOLATION_ERROR_CODE
     ) {
       throw new DuplicateAccountException(
-        `${createAccountDto.accountNumber} already register`,
+        `${createAccountDto.userId} already exist`,
         {
           key: 'user',
           value: createAccountDto.userId.toString(),
