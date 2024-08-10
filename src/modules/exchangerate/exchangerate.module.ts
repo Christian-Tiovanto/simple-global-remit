@@ -9,5 +9,6 @@ import { AccountModule } from '../account/account.module';
   imports: [TypeOrmModule.forFeature([ExchangeRate]), AccountModule],
   providers: [ExchangeRateService],
   controllers: [ExchangeRateController],
+  exports: [ExchangeRateService],
 })
 export class ExchangeRateModule {}

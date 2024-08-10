@@ -7,6 +7,7 @@ import { ErrorCode } from 'src/enums/error-code';
 import { DuplicateExchangeException } from 'src/exceptions/duplicate-exchange-rate.exception';
 import { ConvertExchangeValueDto } from '../dtos/get-exchange-value.dto';
 import { AccountService } from 'src/modules/account/services/account.service';
+import { CalculateTransactionAmount } from 'src/interfaces/calculate-transaction-amount';
 
 @Injectable()
 export class ExchangeRateService {
@@ -48,6 +49,7 @@ export class ExchangeRateService {
         toCurrency: { currency_signature: toCurr },
       },
     });
+    if (!exchangeValue) throw new BadRequestException('There is no exchange rate for those currency yet');
     return exchangeValue;
   }
 
@@ -55,5 +57,17 @@ export class ExchangeRateService {
     const exchangeRate = await this.getUserExchangeTo(convertExchangeValueDto.toCurrency, userId);
     const amount = exchangeRate.exchangeRate * convertExchangeValueDto.amount;
     return amount;
+  }
+  async getAmountforTransaction(calculateTransactionProps: CalculateTransactionAmount) {
+    const exchangeValue = await this.exchangeRepository.findOne({
+      where: {
+        fromCurrency: { currency_signature: calculateTransactionProps.fromCurrency },
+        toCurrency: { currency_signature: calculateTransactionProps.toCurrency },
+      },
+    });
+    if (!exchangeValue) throw new BadRequestException('There is no exchange rate for those currency yet');
+    const calculatedValue = exchangeValue.exchangeRate * calculateTransactionProps.amount;
+    const calculateFormattedAmount = Number(calculatedValue.toFixed(2));
+    return calculateFormattedAmount;
   }
 }

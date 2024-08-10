@@ -6,9 +6,10 @@ import { TransactionService } from './services/transaction.service';
 import { TransactionController } from './controllers/transaction.controller';
 import { AccountModule } from '../account/account.module';
 import { CurrencyModule } from '../currency/currency.module';
+import { ExchangeRateModule } from '../exchangerate/exchangerate.module';
 
 @Module({
-  imports: [UserModule, TypeOrmModule.forFeature([Transaction]), AccountModule, CurrencyModule],
+  imports: [UserModule, TypeOrmModule.forFeature([Transaction]), AccountModule, CurrencyModule, ExchangeRateModule],
   providers: [TransactionService],
   controllers: [TransactionController],
 })

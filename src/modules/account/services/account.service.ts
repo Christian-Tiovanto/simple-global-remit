@@ -85,7 +85,7 @@ export class AccountService {
   }
 
   async getUserAccountWithManager(entityManager: EntityManager, id: number) {
-    const account = await entityManager.findOne(Account, { where: { user: { id } } });
+    const account = await entityManager.findOne(Account, { where: { user: { id } }, relations: { currency: true } });
     if (!account) throw new BadRequestException('this user doesnt have an account yet');
     return account;
   }

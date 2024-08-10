@@ -5,7 +5,8 @@ import { EntityManager, Repository } from 'typeorm';
 import { CreateTransactionQuery } from '../classess/create-transaction.dto';
 import { AccountService } from 'src/modules/account/services/account.service';
 import { CurrencyService } from 'src/modules/currency/services/currency.service';
-import { Currency } from 'src/modules/currency/models/currency.entity';
+import { ExchangeRateService } from 'src/modules/exchangerate/services/exhange-rate.service';
+import { CalculateTransactionAmount } from 'src/interfaces/calculate-transaction-amount';
 
 @Injectable()
 export class TransactionService {
@@ -13,6 +14,7 @@ export class TransactionService {
     @InjectRepository(Transaction) private transactionRepository: Repository<Transaction>,
     private accountService: AccountService,
     private currencyService: CurrencyService,
+    private exchangeService: ExchangeRateService,
   ) {}
 
   async getUserTransactionHistory(id: number) {
@@ -26,10 +28,11 @@ export class TransactionService {
         userId,
         createTransactionQuery['receiver-account'],
       );
-      const formattedAmount = await this.calculateFormattedAmount(
-        receiverAccount.currency.currency_signature,
-        createTransactionQuery.amount,
-      );
+      const formattedAmount = await this.calculateAmount({
+        toCurrency: receiverAccount.currency.currency_signature,
+        fromCurrency: userAccount.currency.currency_signature,
+        amount: createTransactionQuery.amount,
+      });
       await this.accountService.updateUserAndReceiverBalanceWithManager(
         entityManager,
         { userAccount, receiverAccount },
@@ -48,13 +51,11 @@ export class TransactionService {
     return amount;
   }
 
-  private async calculateFormattedAmount(
-    receiverAccountCurrency: Currency['currency_signature'],
-    amount: CreateTransactionQuery['amount'],
-  ): Promise<number> {
-    const conversionValue = await this.currencyService.getConversionValue(receiverAccountCurrency, {
-      amount: amount,
-      reverse: false,
+  private async calculateAmount(calculateTransaction: CalculateTransactionAmount): Promise<number> {
+    const conversionValue = await this.exchangeService.getAmountforTransaction({
+      amount: calculateTransaction.amount,
+      toCurrency: calculateTransaction.toCurrency,
+      fromCurrency: calculateTransaction.fromCurrency,
     });
     return Number(conversionValue.toFixed(2));
   }
