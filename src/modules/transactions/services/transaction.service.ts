@@ -4,7 +4,6 @@ import { Transaction } from '../models/transactions.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { CreateTransactionQuery } from '../classess/create-transaction.dto';
 import { AccountService } from 'src/modules/account/services/account.service';
-import { CurrencyService } from 'src/modules/currency/services/currency.service';
 import { ExchangeRateService } from 'src/modules/exchangerate/services/exhange-rate.service';
 import { CalculateTransactionAmount } from 'src/interfaces/calculate-transaction-amount';
 
@@ -13,7 +12,6 @@ export class TransactionService {
   constructor(
     @InjectRepository(Transaction) private transactionRepository: Repository<Transaction>,
     private accountService: AccountService,
-    private currencyService: CurrencyService,
     private exchangeService: ExchangeRateService,
   ) {}
 
