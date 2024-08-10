@@ -73,7 +73,7 @@ export class AccountService {
   }
 
   async getUserAccount(id: number) {
-    const account = await this.accountRepository.findOne({ where: { user: { id } } });
+    const account = await this.accountRepository.findOne({ where: { user: { id } }, relations: { currency: true } });
     if (!account) throw new BadRequestException('this user doesnt have an account yet');
     return account;
   }
