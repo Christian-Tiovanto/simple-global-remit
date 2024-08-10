@@ -10,13 +10,13 @@ export interface JsonApiConflictError {
   status: string;
   source: string | string[];
   title: string;
-  value: string;
+  value: string | string[];
   type: string;
 }
 
 export interface JsonApiDetailConflictError {
-  value: string;
-  key: string;
+  value: string | string[];
+  key: string | string[];
 }
 
 export interface JsonApiDetailValidationError {
