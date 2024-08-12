@@ -1,10 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Currency } from '../models/currency.entity';
 import { Repository } from 'typeorm';
 import { CreateCurrencyDto } from '../dtos/create-currency.dto';
 import { DuplicateCurrencyException } from 'src/exceptions/duplicate-currency.exception';
-import { ConversionValueQuery } from '../classes/currency.class';
 
 @Injectable()
 export class CurrencyService {
@@ -30,18 +29,6 @@ export class CurrencyService {
   async getAllCurrency() {
     const currencys = await this.currencyRepository.find();
     return currencys;
-  }
-
-  async getConversionValue(currency_signature: string, conversionValueQuery: ConversionValueQuery) {
-    const currency = await this.getCurrency(currency_signature);
-    if (!currency) throw new BadRequestException('There is no Currency with that signature');
-
-    let convertedValue;
-    if (conversionValueQuery.reverse) {
-      return (convertedValue = currency.conversion_rate_to_idr * conversionValueQuery.amount);
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    return (convertedValue = conversionValueQuery.amount / currency.conversion_rate_to_idr);
   }
 
   async getCurrency(currency_signature: string) {

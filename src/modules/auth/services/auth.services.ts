@@ -11,15 +11,9 @@ export class AuthService {
   ) {}
   async login(loginDto: LoginDto) {
     const user = await this.userService.getUserbyEmail(loginDto.email);
-    if (
-      !user ||
-      !(await bcrypt.compare(loginDto.password.toString(), user ? user.password : 'null'))
-    )
+    if (!user || !(await bcrypt.compare(loginDto.password.toString(), user ? user.password : 'null')))
       throw new UnauthorizedException('Invalid Email | password');
-    const token = await this.jwtService.sign(
-      { email: user.email, id: user.id },
-      { secret: process.env.JWT_SECRET },
-    );
+    const token = await this.jwtService.sign({ email: user.email, id: user.id }, { secret: process.env.JWT_SECRET });
     return {
       message: 'Login Successfull',
       token,

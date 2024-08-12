@@ -1,20 +1,26 @@
 import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 @Entity()
 export class User {
+  @ApiProperty({ example: 1 })
   @PrimaryGeneratedColumn()
   id: number;
 
+  @ApiProperty({ example: 'christiantiovanto1@gmail.com' })
   @Column({ unique: true })
   email: string;
 
+  @ApiProperty({ example: 'christian' })
   @Column()
   firstName: string;
 
+  @ApiProperty({ example: 'tiovanto' })
   @Column({ type: 'varchar' })
   lastName: string;
 
+  @ApiProperty({ required: false })
   @Column({ default: true })
   isActive: boolean;
 
@@ -23,6 +29,7 @@ export class User {
     this.password = await bcrypt.hash(this.password, 10);
   }
 
+  @ApiProperty({ example: '123456' })
   @Exclude()
   @Column()
   password: string;

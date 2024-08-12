@@ -8,6 +8,7 @@ import { DuplicateExchangeException } from 'src/exceptions/duplicate-exchange-ra
 import { ConvertExchangeValueDto } from '../dtos/get-exchange-value.dto';
 import { AccountService } from 'src/modules/account/services/account.service';
 import { CalculateTransactionAmount } from 'src/interfaces/calculate-transaction-amount';
+import { ExchangeForeignConstraintException } from 'src/exceptions/exchange-foreignkey.exception';
 
 @Injectable()
 export class ExchangeRateService {
@@ -26,6 +27,11 @@ export class ExchangeRateService {
     } catch (error) {
       if (
         error instanceof QueryFailedError &&
+        error.driverError.code === ErrorCode.POSTGRES_FOREIGN_KEY_CONSTRAINT_ERROR_CODE
+      )
+        this.getForeignKeyErrorDetail(error);
+      if (
+        error instanceof QueryFailedError &&
         error.driverError.code === ErrorCode.POSTGRES_UNIQUE_VIOLATION_ERROR_CODE
       )
         this.getDuplicateErrorDetail(error);
@@ -36,11 +42,24 @@ export class ExchangeRateService {
   private getDuplicateErrorDetail(error) {
     const regex = /Key \("(\w+)", "(\w+)"\)=\((\w+), (\w+)\)/;
     const errorDetail = error.driverError.detail.match(regex);
-    const errorDetailKey = [errorDetail[1], errorDetail[2]];
-    const errorDetailVal = [errorDetail[3], errorDetail[4]];
-    throw new DuplicateExchangeException('Duplicate Exchange Rate', { value: errorDetailVal, key: errorDetailKey });
+    if (errorDetail) {
+      const errorDetailKey = [errorDetail[1], errorDetail[2]];
+      const errorDetailVal = [errorDetail[3], errorDetail[4]];
+      throw new DuplicateExchangeException('Duplicate Exchange Rate', { value: errorDetailVal, key: errorDetailKey });
+    }
+    throw error;
   }
 
+  private getForeignKeyErrorDetail(error) {
+    const regex = /Key \(([^)]+)\)=\(([^)]+)\)/;
+    const errorDetail = error.driverError.detail.match(regex);
+    const errorDetailKey = errorDetail[1];
+    const errorDetailValue = errorDetail[2];
+    throw new ExchangeForeignConstraintException(`${errorDetailValue}from ${errorDetailKey} doesnt exist`, {
+      key: errorDetailKey,
+      value: errorDetailValue,
+    });
+  }
   async getUserExchangeTo(toCurr: ConvertExchangeValueDto['toCurrency'], userId: number) {
     const userAccCurr = await this.accountService.getUserAccount(userId);
     const exchangeValue = await this.exchangeRepository.findOne({
@@ -49,7 +68,10 @@ export class ExchangeRateService {
         toCurrency: { currency_signature: toCurr },
       },
     });
-    if (!exchangeValue) throw new BadRequestException('There is no exchange rate for those currency yet');
+    if (!exchangeValue)
+      throw new BadRequestException(
+        `There is no exchange rate from ${userAccCurr.currency.currency_signature} to ${toCurr} currency yet`,
+      );
     return exchangeValue;
   }
 
@@ -58,15 +80,18 @@ export class ExchangeRateService {
     const amount = exchangeRate.exchangeRate * convertExchangeValueDto.amount;
     return amount;
   }
-  async getAmountforTransaction(calculateTransactionProps: CalculateTransactionAmount) {
+  async getAmountforTransaction(calculateTransactionArgs: CalculateTransactionAmount) {
     const exchangeValue = await this.exchangeRepository.findOne({
       where: {
-        fromCurrency: { currency_signature: calculateTransactionProps.fromCurrency },
-        toCurrency: { currency_signature: calculateTransactionProps.toCurrency },
+        fromCurrency: { currency_signature: calculateTransactionArgs.fromCurrency },
+        toCurrency: { currency_signature: calculateTransactionArgs.toCurrency },
       },
     });
-    if (!exchangeValue) throw new BadRequestException('There is no exchange rate for those currency yet');
-    const calculatedValue = exchangeValue.exchangeRate * calculateTransactionProps.amount;
+    if (!exchangeValue)
+      throw new BadRequestException(
+        `There is no exchange rate from ${calculateTransactionArgs.fromCurrency} to ${calculateTransactionArgs.toCurrency} currency yet`,
+      );
+    const calculatedValue = exchangeValue.exchangeRate * calculateTransactionArgs.amount;
     const calculateFormattedAmount = Number(calculatedValue.toFixed(2));
     return calculateFormattedAmount;
   }

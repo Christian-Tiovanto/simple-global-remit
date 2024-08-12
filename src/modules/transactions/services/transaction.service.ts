@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Transaction } from '../models/transactions.entity';
 import { EntityManager, Repository } from 'typeorm';
-import { CreateTransactionQuery } from '../classess/create-transaction.dto';
+import { CreateTransactionQuery } from '../classess/transaction.class';
 import { AccountService } from 'src/modules/account/services/account.service';
 import { ExchangeRateService } from 'src/modules/exchangerate/services/exhange-rate.service';
 import { CalculateTransactionAmount } from 'src/interfaces/calculate-transaction-amount';
@@ -16,7 +16,13 @@ export class TransactionService {
   ) {}
 
   async getUserTransactionHistory(id: number) {
-    const transactions = await this.transactionRepository.find({ where: { user: { id } } });
+    const transactions = await this.transactionRepository.find({
+      where: { user: { id } },
+      relations: { toAccount: true },
+    });
+    transactions.forEach((transaction) => {
+      transaction.toAccount.balance = undefined;
+    });
     return transactions;
   }
   async createTransaction(createTransactionQuery: CreateTransactionQuery, userId: number) {
@@ -44,7 +50,7 @@ export class TransactionService {
         currency: receiverAccount.currency,
       });
       await entityManager.save(transaction);
-      return formattedAmount;
+      return transaction;
     });
     return amount;
   }

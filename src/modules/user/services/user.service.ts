@@ -40,11 +40,6 @@ export class UserService {
 
   async getUserbyId(id: number): Promise<User> | undefined {
     const user = await this.usersRepository.findOne({ where: { id } });
-    return user;
-  }
-
-  async getUsersbyId(idList: number[]): Promise<User[]> | undefined {
-    const users = await this.usersRepository.find({ where: { id: In(idList) } });
-    return users;
+    return plainToInstance(User, user);
   }
 }

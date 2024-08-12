@@ -1,0 +1,10 @@
+Address:
+  properties:
+    allOf:
+      $ref: '#/Student'
+    city:
+      type: string
+      description: City
+    state:
+      type: string
+      description: State

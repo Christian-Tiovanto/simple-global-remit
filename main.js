@@ -44,3 +44,13 @@ const coba = Number(aaa.toFixed(2));
 tes += aaa;
 console.log(coba);
 console.log(tes);
+
+const yaml = require('js-yaml');
+const fs = require('fs');
+
+try {
+  const data = yaml.load(fs.readFileSync('tes.yml', 'utf8'));
+  console.log(data);
+} catch (e) {
+  console.error(e);
+}
