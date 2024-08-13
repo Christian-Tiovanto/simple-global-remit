@@ -1,14 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ExchangeRate } from '../models/exchange-rate.entity';
-import { QueryFailedError, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateExchangeDto } from '../dtos/create-exchange.dto';
-import { ErrorCode } from 'src/enums/error-code';
-import { DuplicateExchangeException } from 'src/exceptions/duplicate-exchange-rate.exception';
 import { ConvertExchangeValueDto } from '../dtos/get-exchange-value.dto';
 import { AccountService } from 'src/modules/account/services/account.service';
 import { CalculateTransactionAmount } from 'src/interfaces/calculate-transaction-amount';
-import { ExchangeForeignConstraintException } from 'src/exceptions/exchange-foreignkey.exception';
+import { getConstraintError } from 'src/utils/get-error-constraint';
+import { ExchangeRateColumnName } from 'src/enums/country-column';
 
 @Injectable()
 export class ExchangeRateService {
@@ -21,45 +20,20 @@ export class ExchangeRateService {
     try {
       if (createExchangeDto.fromCurrency === createExchangeDto.toCurrency)
         throw new BadRequestException('cant create Exchange Rate from the same currency');
-      const sql = `insert into exchange_rate ("fromCurrencyCode" ,"toCurrencyCode","exchangeRate") values ('${createExchangeDto.fromCurrency}','${createExchangeDto.toCurrency}','${createExchangeDto.exchangerate}') returning *`;
-      const result = await this.exchangeRepository.query(sql);
-      return result[0];
+      const exchange = await this.exchangeRepository.manager.transaction(async (entityManager) => {
+        const sql = `insert into exchange_rate ("${ExchangeRateColumnName.FROM_CURRENCY}" ,"${ExchangeRateColumnName.TO_CURRENCY}","exchangeRate") values ('${createExchangeDto.fromCurrency}','${createExchangeDto.toCurrency}','${createExchangeDto.exchangerate}') returning *`;
+        const result = await entityManager.query(sql);
+
+        const inverseSql = `insert into exchange_rate ("${ExchangeRateColumnName.TO_CURRENCY}" ,"${ExchangeRateColumnName.FROM_CURRENCY}","exchangeRate") values ('${createExchangeDto.fromCurrency}','${createExchangeDto.toCurrency}','${1 / createExchangeDto.exchangerate}') returning *`;
+        const inverseResult = await entityManager.query(inverseSql);
+        return result[0];
+      });
+      return exchange;
     } catch (error) {
-      if (
-        error instanceof QueryFailedError &&
-        error.driverError.code === ErrorCode.POSTGRES_FOREIGN_KEY_CONSTRAINT_ERROR_CODE
-      )
-        this.getForeignKeyErrorDetail(error);
-      if (
-        error instanceof QueryFailedError &&
-        error.driverError.code === ErrorCode.POSTGRES_UNIQUE_VIOLATION_ERROR_CODE
-      )
-        this.getDuplicateErrorDetail(error);
-      throw error;
+      getConstraintError(error);
     }
   }
 
-  private getDuplicateErrorDetail(error) {
-    const regex = /Key \("(\w+)", "(\w+)"\)=\((\w+), (\w+)\)/;
-    const errorDetail = error.driverError.detail.match(regex);
-    if (errorDetail) {
-      const errorDetailKey = [errorDetail[1], errorDetail[2]];
-      const errorDetailVal = [errorDetail[3], errorDetail[4]];
-      throw new DuplicateExchangeException('Duplicate Exchange Rate', { value: errorDetailVal, key: errorDetailKey });
-    }
-    throw error;
-  }
-
-  private getForeignKeyErrorDetail(error) {
-    const regex = /Key \(([^)]+)\)=\(([^)]+)\)/;
-    const errorDetail = error.driverError.detail.match(regex);
-    const errorDetailKey = errorDetail[1];
-    const errorDetailValue = errorDetail[2];
-    throw new ExchangeForeignConstraintException(`${errorDetailValue}from ${errorDetailKey} doesnt exist`, {
-      key: errorDetailKey,
-      value: errorDetailValue,
-    });
-  }
   async getUserExchangeTo(toCurr: ConvertExchangeValueDto['toCurrency'], userId: number) {
     const userAccCurr = await this.accountService.getUserAccount(userId);
     const exchangeValue = await this.exchangeRepository.findOne({
@@ -74,7 +48,6 @@ export class ExchangeRateService {
       );
     return exchangeValue;
   }
-
   async getConvertedExchangeValue(convertExchangeValueDto: ConvertExchangeValueDto, userId: number) {
     const exchangeRate = await this.getUserExchangeTo(convertExchangeValueDto.toCurrency, userId);
     const amount = exchangeRate.exchangeRate * convertExchangeValueDto.amount;
