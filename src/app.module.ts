@@ -15,6 +15,9 @@ import { AccountModule } from './modules/account/account.module';
 import { Account } from './modules/account/models/account.entity';
 import { ExchangeRate } from './modules/exchangerate/models/exchange-rate.entity';
 import { ExchangeRateModule } from './modules/exchangerate/exchangerate.module';
+import { Country } from './modules/country/model/country.entity';
+import { CountryModule } from './modules/country/country.module';
+import { CountryCurrency } from './modules/country/model/country-currency.entity';
 @Module({
   providers: [
     { provide: APP_PIPE, useClass: DataValidationPipe },
@@ -29,7 +32,7 @@ import { ExchangeRateModule } from './modules/exchangerate/exchangerate.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [Currency, User, Transaction, Account, ExchangeRate],
+      entities: [Currency, User, Transaction, Account, ExchangeRate, Country, CountryCurrency],
       synchronize: true,
     }),
     CurrencyModule,
@@ -38,6 +41,7 @@ import { ExchangeRateModule } from './modules/exchangerate/exchangerate.module';
     AuthModule,
     AccountModule,
     ExchangeRateModule,
+    CountryModule,
   ],
 })
 export class AppModule {}
