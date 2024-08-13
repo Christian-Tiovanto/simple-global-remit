@@ -6,8 +6,6 @@ import { ApiBearerAuth, ApiCreatedResponse, ApiExtraModels, ApiOkResponse, ApiPa
 import { SwaggerResponseWrapper } from 'src/utils/api-response-wrapper';
 import { User } from '../models/user.entity';
 import { CreateUserResponse, GetUserResponse } from '../classes/user.class';
-import { ErrorCode } from 'src/enums/error-code';
-
 @ApiTags('user')
 @ApiBearerAuth()
 @ApiExtraModels(CreateUserResponse, GetUserResponse)

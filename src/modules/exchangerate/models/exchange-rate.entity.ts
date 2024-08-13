@@ -6,20 +6,20 @@ import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn,
 @Entity()
 export class ExchangeRate {
   @ApiProperty({ example: 'USD' })
-  @PrimaryColumn({ type: 'varchar', name: ExchangeRateColumnName.FROM_CURRENCY })
-  fromCurrencyCode: string;
+  @PrimaryColumn({ type: 'varchar' })
+  from_currency_code: string;
 
   @ApiProperty({ example: 'EUR' })
-  @PrimaryColumn({ type: 'varchar', name: ExchangeRateColumnName.TO_CURRENCY })
-  toCurrencyCode: string;
+  @PrimaryColumn({ type: 'varchar' })
+  to_currency_code: string;
 
   @ManyToOne(() => Currency, { nullable: false })
   @JoinColumn({ name: ExchangeRateColumnName.FROM_CURRENCY })
-  fromCurrency: Currency;
+  from_currency: Currency;
 
   @ManyToOne(() => Currency, { nullable: false })
   @JoinColumn({ name: ExchangeRateColumnName.TO_CURRENCY })
-  toCurrency: Currency;
+  to_currency: Currency;
 
   @ApiProperty({ type: Date, format: 'date-time' })
   @UpdateDateColumn()
@@ -30,10 +30,6 @@ export class ExchangeRate {
   createdAt: Date;
 
   @ApiProperty({ example: 200 })
-  @Column({ type: 'double precision' })
-  exchangeRate: number;
-
-  @ApiProperty({ example: 70000 })
   @Column({ type: 'decimal' })
-  fee: number;
+  exchange_rate: number;
 }

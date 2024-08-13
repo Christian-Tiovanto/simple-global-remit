@@ -4,13 +4,13 @@ import { IsNumber, IsString } from 'class-validator';
 export class CreateExchangeDto {
   @ApiProperty({ example: 'USD' })
   @IsString()
-  fromCurrency: string;
+  from_currency: string;
 
   @ApiProperty({ example: 'EUR' })
   @IsString()
-  toCurrency: string;
+  to_currency: string;
 
   @ApiProperty({ example: 200 })
   @IsNumber()
-  exchangerate: number;
+  exchange_rate: number;
 }

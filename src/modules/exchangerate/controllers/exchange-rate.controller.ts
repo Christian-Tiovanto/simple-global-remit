@@ -36,7 +36,7 @@ export class ExchangeRateController {
   })
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getConvertedExchangeValue(@Request() req, @Query() convertExchangeValueDto: ConvertExchangeValueDto) {
-    return await this.exchangeService.getConvertedExchangeValue(convertExchangeValueDto, req.user.id);
+  async getConvertedExchangeValue(@Query() convertExchangeValueDto: ConvertExchangeValueDto) {
+    return await this.exchangeService.getConvertedExchangeValue(convertExchangeValueDto);
   }
 }
