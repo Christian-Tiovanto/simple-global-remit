@@ -14,6 +14,6 @@ export class RolesGuard implements CanActivate {
     if (roles.includes(user.role)) {
       return true;
     }
-    throw new UnauthorizedException('Unauthorized');
+    throw new UnauthorizedException('Unauthorized, you dont have permisiion to do that');
   }
 }

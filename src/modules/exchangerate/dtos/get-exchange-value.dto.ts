@@ -17,7 +17,7 @@ export class ConvertExchangeValueDto {
   amount: number;
 
   @ApiProperty({ example: true })
-  @Transform(({ value }) => value === 'true', { toClassOnly: true })
+  @Transform(parseBoolean)
   @IsBoolean()
   @IsNotEmpty()
   reverse: boolean;
