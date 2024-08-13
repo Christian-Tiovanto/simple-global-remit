@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { Role } from 'src/enums/user-role';
 @Entity()
 export class User {
   @ApiProperty({ example: 1 })
@@ -33,4 +34,7 @@ export class User {
   @Exclude()
   @Column()
   password: string;
+
+  @Column({ type: 'enum', enum: Role, default: Role.CLIENT })
+  role: Role;
 }
