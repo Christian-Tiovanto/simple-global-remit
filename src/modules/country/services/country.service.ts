@@ -49,7 +49,7 @@ export class CountryService {
   }
 
   async getAllCountryAndCurrency() {
-    const sql = `select c.country_signature ,c.country_name,array_agg(cc.country_currency ) country_currency from country c left join country_currency cc on c.country_signature  = cc.country_signature group by c.country_signature`;
+    const sql = `select c.country_signature ,c.country_name,cc.fee,array_agg(cc.country_currency ) country_currency from country c left join country_currency cc on c.country_signature  = cc.country_signature group by c.country_signature, cc.fee`;
     const result = await this.countryCurrencyRepository.query(sql);
     console.log(result);
     return result;

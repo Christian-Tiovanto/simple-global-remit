@@ -1,4 +1,4 @@
-import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
 import { Country } from './country.entity';
 import { Currency } from 'src/modules/currency/models/currency.entity';
 import { ApiProperty } from '@nestjs/swagger';
@@ -19,4 +19,8 @@ export class CountryCurrency {
   @JoinColumn({ name: 'country_currency' })
   @ManyToOne(() => Currency, (country) => country.currency_signature)
   country_currency: Currency;
+
+  @ApiProperty({ default: 40000, nullable: true })
+  @Column({ type: 'decimal', default: 40000 })
+  fee: number;
 }

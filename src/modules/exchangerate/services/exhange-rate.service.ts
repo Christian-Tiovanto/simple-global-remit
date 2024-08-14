@@ -52,7 +52,7 @@ export class ExchangeRateService {
     if (!exchangeRate)
       throw new BadRequestException(`there is no exchange rate from IDR to ${to_currency} or the other way around`);
     const exchangeValue = exchangeRate.exchange_rate * amount;
-    return exchangeValue;
+    return { amount: exchangeValue };
   }
   async getAmountforTransaction(calculateTransactionArgs: CalculateTransactionAmount) {
     const exchangeValue = await this.exchangeRepository.findOne({
