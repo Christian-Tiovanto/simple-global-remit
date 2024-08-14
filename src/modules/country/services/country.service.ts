@@ -7,6 +7,7 @@ import { AddCountryCurrencyDto } from '../dtos/add-country-currency.dto';
 import { getConstraintError } from 'src/utils/get-error-constraint';
 import { CurrencyService } from 'src/modules/currency/services/currency.service';
 import { CountryCurrency } from '../model/country-currency.entity';
+import { GetCountryDto } from '../dtos/getCountry.dto';
 
 @Injectable()
 export class CountryService {
@@ -46,6 +47,14 @@ export class CountryService {
     const currency = await this.currencyService.getCurrency(country_currency);
     if (!currency) throw new BadRequestException('there is no currency with that signature');
     return { country, currency };
+  }
+
+  async getCountry(getCountryDto: GetCountryDto) {
+    const country = await this.countryRepository.findOne({
+      where: { country_signature: getCountryDto.country_signature },
+    });
+    if (!country) throw new BadRequestException('there is no country with that id');
+    return country;
   }
 
   async getAllCountryAndCurrency() {

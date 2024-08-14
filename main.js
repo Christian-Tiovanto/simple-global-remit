@@ -54,3 +54,13 @@ try {
 } catch (e) {
   console.error(e);
 }
+
+console.log(Math.ceil(0.000068965) / 100);
+let num = 0.000000068965;
+
+// Using Math.ceil() approach
+function roundUpToTenDecimalPlaces(num) {
+  return Math.ceil(num * 10000000000) / 10000000000;
+}
+console.log(roundUpToTenDecimalPlaces(num).toFixed(10));
+console.log(Number(1 / 0.00045));

@@ -22,7 +22,7 @@ export class AccountService {
         throw new BadRequestException('Currency Signature must be 3 character');
       const account = await this.accountRepository.create({
         ...createAccountDto,
-        user: { id: createAccountDto.userId },
+        user: { id: createAccountDto.user_id },
         currency: { currency_signature: createAccountDto.currency },
       });
       await this.accountRepository.save(account);
@@ -51,20 +51,20 @@ export class AccountService {
       err.driverError.code === ErrorCode.POSTGRES_UNIQUE_VIOLATION_ERROR_CODE
     ) {
       throw new DuplicateAccountException(
-        `${createAccountDto.userId} already exist`,
+        `${createAccountDto.user_id} already exist`,
         {
           key: 'user',
-          value: createAccountDto.userId.toString(),
+          value: createAccountDto.user_id.toString(),
         },
         'Duplicate User Account',
       );
     }
     if (err instanceof QueryFailedError && err.driverError.code === ErrorCode.POSTGRES_UNIQUE_VIOLATION_ERROR_CODE) {
       throw new DuplicateAccountException(
-        `${createAccountDto.accountNumber} already register`,
+        `${createAccountDto.account_number} already register`,
         {
           key: 'accountNumber',
-          value: createAccountDto.accountNumber.toString(),
+          value: createAccountDto.account_number.toString(),
         },
         'Duplicate Account Number',
       );
@@ -79,7 +79,7 @@ export class AccountService {
   }
 
   async getAccountByNumber(accountNumber: number) {
-    const account = await this.accountRepository.findOne({ where: { accountNumber } });
+    const account = await this.accountRepository.findOne({ where: { account_number: accountNumber } });
     if (!account) throw new BadRequestException('There is no account with that number');
     return account;
   }
@@ -91,7 +91,10 @@ export class AccountService {
   }
 
   async getAccountByNumberWithManager(entityManager: EntityManager, accountNumber: number) {
-    const account = await entityManager.findOne(Account, { where: { accountNumber }, relations: { currency: true } });
+    const account = await entityManager.findOne(Account, {
+      where: { account_number: accountNumber },
+      relations: { currency: true },
+    });
     if (!account) throw new BadRequestException('there is no account with that number');
     return account;
   }

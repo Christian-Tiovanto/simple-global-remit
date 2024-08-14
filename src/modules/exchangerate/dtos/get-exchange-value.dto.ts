@@ -1,8 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
-import { IsBoolean, IsNotEmpty, IsNumber, IsString, Length, Min } from 'class-validator';
-import { parseBoolean } from 'src/utils/parse-boolean-transform';
-import { parseNumber } from 'src/utils/parse-number-transform';
+import { IsAlpha, IsEnum, IsString, Length } from 'class-validator';
+import { AmountType } from 'src/enums/amount-type';
 
 export class ConvertExchangeValueDto {
   @ApiProperty({ example: 'USD', required: true })
@@ -10,15 +8,11 @@ export class ConvertExchangeValueDto {
   @Length(3, 3)
   to_currency: string;
 
-  @ApiProperty({ example: 10000, required: true })
-  @IsNumber()
-  @Min(0, { message: 'Amount must not be negative' })
-  @Transform(parseNumber)
-  amount: number;
+  @ApiProperty({ enum: AmountType, required: true })
+  @IsEnum(AmountType)
+  amount_type: AmountType;
 
-  @ApiProperty({ example: true })
-  @Transform(parseBoolean)
-  @IsBoolean()
-  @IsNotEmpty()
-  reverse: boolean;
+  @ApiProperty({ example: 'SGP' })
+  @IsAlpha()
+  destination_country: string;
 }

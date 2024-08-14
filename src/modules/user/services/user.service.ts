@@ -40,6 +40,7 @@ export class UserService {
 
   async getUserbyId(id: number): Promise<User> | undefined {
     const user = await this.usersRepository.findOne({ where: { id } });
+    if (!user) throw new BadRequestException('there is no user with that id');
     return plainToInstance(User, user);
   }
 }

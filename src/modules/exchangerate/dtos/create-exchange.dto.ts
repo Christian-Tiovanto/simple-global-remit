@@ -2,10 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsString } from 'class-validator';
 
 export class CreateExchangeDto {
-  @ApiProperty({ example: 'USD' })
-  @IsString()
-  from_currency: string;
-
   @ApiProperty({ example: 'EUR' })
   @IsString()
   to_currency: string;

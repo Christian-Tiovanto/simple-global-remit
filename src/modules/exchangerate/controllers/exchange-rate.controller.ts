@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ExchangeRateService } from '../services/exhange-rate.service';
 import { CreateExchangeDto } from '../dtos/create-exchange.dto';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
@@ -7,6 +7,9 @@ import { ApiBearerAuth, ApiCreatedResponse, ApiExtraModels, ApiOkResponse, ApiQu
 import { SwaggerResponseWrapper } from 'src/utils/api-response-wrapper';
 import { ExchangeRate } from '../models/exchange-rate.entity';
 import { ConvertValueResponse } from '../classes/exchange-rate.class';
+import { UpdateExchangeRateDto } from '../dtos/update-exchange-rate.dto';
+import { Auth } from 'src/decorators/auth.decorator';
+import { Role } from 'src/enums/user-role';
 
 @ApiTags('exchange')
 @ApiExtraModels(ExchangeRate)
@@ -38,5 +41,12 @@ export class ExchangeRateController {
   @Get()
   async getConvertedExchangeValue(@Query() convertExchangeValueDto: ConvertExchangeValueDto) {
     return await this.exchangeService.getConvertedExchangeValue(convertExchangeValueDto);
+  }
+
+  // @ApiOkResponse()
+  @Auth(Role.ADMIN)
+  @Patch('update')
+  async updateExchangeRate(@Body() updateExchangeRateDto: UpdateExchangeRateDto) {
+    return await this.exchangeService.updateExchangeRate(updateExchangeRateDto);
   }
 }

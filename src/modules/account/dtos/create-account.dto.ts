@@ -7,7 +7,7 @@ export class CreateAccountDto {
   @ApiProperty({ example: 123456 })
   @Transform(parseNumber)
   @IsNumber()
-  accountNumber: number;
+  account_number: number;
 
   @ApiProperty({ example: 100000 })
   @IsNumber()
@@ -15,7 +15,7 @@ export class CreateAccountDto {
 
   @ApiProperty({ example: 1 })
   @IsNumber()
-  userId: number;
+  user_id: number;
 
   @ApiProperty({ example: 'EUR' })
   @IsString()

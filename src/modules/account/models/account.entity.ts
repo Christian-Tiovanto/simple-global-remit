@@ -11,7 +11,7 @@ export class Account {
 
   @ApiProperty({ example: 123456 })
   @Column({ unique: true })
-  accountNumber: number;
+  account_number: number;
 
   @ApiProperty({ example: 100000 })
   @Column({ type: 'double precision' })

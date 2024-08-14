@@ -1,6 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Account } from 'src/modules/account/models/account.entity';
-import { Currency } from 'src/modules/currency/models/currency.entity';
 import { User } from 'src/modules/user/models/user.entity';
 import {
   Column,
@@ -14,31 +12,45 @@ import {
 
 @Entity()
 export class Transaction {
+  @ApiProperty({ example: 1 })
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiProperty({ example: { id: 50 } })
   @ManyToOne(() => User, { cascade: ['soft-remove'] })
   @JoinColumn()
   user: User;
 
-  @ApiProperty({ example: Account })
-  @ManyToOne(() => Account, (account) => account.accountNumber)
-  @JoinColumn({ referencedColumnName: 'accountNumber', name: 'fromAccountNumber' })
-  fromAccount: Account;
+  @ApiProperty({ example: 'testing' })
+  @Column({ nullable: false })
+  sender_name: string;
 
-  @ApiProperty({ example: Account })
-  @ManyToOne(() => Account, (account) => account.balance)
-  @JoinColumn({ referencedColumnName: 'accountNumber', name: 'toAccountNumber' })
-  toAccount: Account;
+  @ApiProperty({ example: 'testing receiver' })
+  @Column({ nullable: false })
+  receiver_name: string;
+
+  @ApiProperty({ example: 123456 })
+  @Column()
+  to_account: number;
 
   @ApiProperty({ example: 2000 })
   @Column({ type: 'double precision' })
-  totalAmount: number;
+  total_amount: number;
 
-  @ApiProperty({ example: Currency })
-  @ManyToOne(() => Currency, (currency) => currency.currency_signature)
-  currency: Currency;
+  @ApiProperty({ example: 'USD' })
+  @Column()
+  currency: string;
+
+  @ApiProperty({ example: 0.005 })
+  @Column({ type: 'decimal' })
+  rate: number;
+
+  @ApiProperty({ example: 40000 })
+  @Column({ type: 'decimal' })
+  fee: number;
+
+  @ApiProperty({ example: 'SGP' })
+  @Column()
+  destination_country: string;
 
   @ApiProperty({ type: Date, format: 'date-time' })
   @CreateDateColumn()

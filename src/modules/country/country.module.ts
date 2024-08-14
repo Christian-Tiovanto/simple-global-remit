@@ -10,5 +10,6 @@ import { CountryCurrency } from './model/country-currency.entity';
   imports: [TypeOrmModule.forFeature([Country, CountryCurrency]), CurrencyModule],
   controllers: [CountryController],
   providers: [CountryService],
+  exports: [CountryService],
 })
 export class CountryModule {}

@@ -3,7 +3,7 @@ import { CreateAccountDto } from '../dtos/create-account.dto';
 import { Account } from '../models/account.entity';
 import { Currency } from 'src/modules/currency/models/currency.entity';
 
-export class AccountCreateResponse extends OmitType(CreateAccountDto, ['currency', 'userId']) {
+export class AccountCreateResponse extends OmitType(CreateAccountDto, ['currency', 'user_id']) {
   @ApiProperty({ example: { currency_signature: 'USD' } })
   currency: object;
 
