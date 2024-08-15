@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { TransactionStatus } from 'src/enums/transaction-status';
 import { User } from 'src/modules/user/models/user.entity';
 import {
   Column,
@@ -55,6 +56,9 @@ export class Transaction {
   @ApiProperty({ example: 'SGP' })
   @Column()
   destination_country: string;
+
+  @Column({ type: 'enum', enum: TransactionStatus, default: TransactionStatus.PENDING })
+  status: TransactionStatus;
 
   @ApiProperty({ type: Date, format: 'date-time' })
   @CreateDateColumn()
