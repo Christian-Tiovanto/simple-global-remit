@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Request, UseGuards } from '@nestjs/common';
 import { TransactionService } from '../services/transaction.service';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Transaction } from '../models/transactions.entity';
 import { CreateTransactionDto } from '../dtos/create-transaction.dto';
+import { UpdateTransactionStatusDto } from '../dtos/update-transaction-status.dto';
 
 @ApiTags('transaction')
 @ApiBearerAuth()
@@ -25,5 +26,16 @@ export class TransactionController {
   @Get()
   async getUserTransactionHistory(@Request() req) {
     return await this.transactionService.getUserTransactionHistory(req.user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('pay/:id')
+  async updatePaidTransactionStatus(@Param('id', ParseIntPipe) id: number) {
+    return await this.transactionService.updatePaidTransactionStatus({ id });
+  }
+
+  @Patch('update/:id')
+  async updateTransactionStatus(@Body() updateTransactionStatusDto: UpdateTransactionStatusDto) {
+    return await this.transactionService.updateTransactionStatus(updateTransactionStatusDto);
   }
 }

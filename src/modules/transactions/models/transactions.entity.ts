@@ -57,6 +57,7 @@ export class Transaction {
   @Column()
   destination_country: string;
 
+  @ApiProperty({ example: TransactionStatus.ONGOING })
   @Column({ type: 'enum', enum: TransactionStatus, default: TransactionStatus.PENDING })
   status: TransactionStatus;
 

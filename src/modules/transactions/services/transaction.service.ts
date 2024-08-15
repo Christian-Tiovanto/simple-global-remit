@@ -6,6 +6,9 @@ import { ExchangeRateService } from 'src/modules/exchangerate/services/exhange-r
 import { CalculateTransactionAmount } from 'src/interfaces/calculate-transaction-amount';
 import { CreateTransactionDto } from '../dtos/create-transaction.dto';
 import { getDestinationFeeDto } from 'src/modules/destination-fee/dtos/getDestinationFee.dto';
+import { UpdatePaidTransactionStatusDto } from '../dtos/update-paid-transaction-status.dto';
+import { TransactionStatus } from 'src/enums/transaction-status';
+import { UpdateTransactionStatusDto } from '../dtos/update-transaction-status.dto';
 
 @Injectable()
 export class TransactionService {
@@ -68,5 +71,22 @@ export class TransactionService {
       destination,
     );
     return Number(conversionValue.toFixed(2));
+  }
+
+  async updatePaidTransactionStatus(updatePaidTransactionStatusDto: UpdatePaidTransactionStatusDto) {
+    const { id } = updatePaidTransactionStatusDto;
+    const transaction = await this.transactionRepository.findOne({ where: { id } });
+    if (!transaction) throw new BadRequestException('there is no transaction with that id');
+    transaction.status = TransactionStatus.ONGOING;
+    await this.transactionRepository.save(transaction);
+    return transaction;
+  }
+  async updateTransactionStatus(updateTransactionStatusDto: UpdateTransactionStatusDto) {
+    const { id, status } = updateTransactionStatusDto;
+    const transaction = await this.transactionRepository.findOne({ where: { id } });
+    if (!transaction) throw new BadRequestException('there is no transaction with that id');
+    transaction.status = status;
+    await this.transactionRepository.save(transaction);
+    return transaction;
   }
 }
