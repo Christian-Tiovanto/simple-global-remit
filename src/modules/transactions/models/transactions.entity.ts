@@ -61,6 +61,9 @@ export class Transaction {
   @Column({ type: 'enum', enum: TransactionStatus, default: TransactionStatus.PENDING })
   status: TransactionStatus;
 
+  @Column({ nullable: true })
+  photo_path: string;
+
   @ApiProperty({ type: Date, format: 'date-time' })
   @CreateDateColumn()
   timeStamp: Date;

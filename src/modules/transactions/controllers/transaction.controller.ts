@@ -1,10 +1,23 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  ParseFilePipeBuilder,
+  Patch,
+  Post,
+  Request,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { TransactionService } from '../services/transaction.service';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Transaction } from '../models/transactions.entity';
 import { CreateTransactionDto } from '../dtos/create-transaction.dto';
 import { UpdateTransactionStatusDto } from '../dtos/update-transaction-status.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UpdatePaidTransactionStatusDto } from '../dtos/update-paid-transaction-status.dto';
 
 @ApiTags('transaction')
 @ApiBearerAuth()
@@ -29,12 +42,19 @@ export class TransactionController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch('pay/:id')
-  async updatePaidTransactionStatus(@Param('id', ParseIntPipe) id: number) {
-    return await this.transactionService.updatePaidTransactionStatus({ id });
+  @UseInterceptors(FileInterceptor('photo'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ description: 'List Of photo', type: UpdatePaidTransactionStatusDto })
+  @Patch('pay')
+  async updatePaidTransactionStatus(
+    @Body() updatePaidTransactionStatusDto: UpdatePaidTransactionStatusDto,
+    @UploadedFile(new ParseFilePipeBuilder().addFileTypeValidator({ fileType: 'image/*' }).build())
+    file: Express.Multer.File,
+  ) {
+    return await this.transactionService.updatePaidTransactionStatus(updatePaidTransactionStatusDto, file.path);
   }
 
-  @Patch('update/:id')
+  @Patch('update')
   async updateTransactionStatus(@Body() updateTransactionStatusDto: UpdateTransactionStatusDto) {
     return await this.transactionService.updateTransactionStatus(updateTransactionStatusDto);
   }

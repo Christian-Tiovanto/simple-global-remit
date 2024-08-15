@@ -64,3 +64,9 @@ function roundUpToTenDecimalPlaces(num) {
 }
 console.log(roundUpToTenDecimalPlaces(num).toFixed(10));
 console.log(Number(1 / 0.00045));
+const obj = Object.create(null);
+obj.tes = 'ea';
+obj.id = '94';
+obj.status = 'pending';
+
+console.log(obj); // Output: [Object: null prototype] { tes: 'ea', id: '94', status: 'pending' }

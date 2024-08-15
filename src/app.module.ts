@@ -20,6 +20,7 @@ import { CountryModule } from './modules/country/country.module';
 import { CountryCurrency } from './modules/country/model/country-currency.entity';
 import { DestinationFee } from './modules/destination-fee/model/destination-fee.entity';
 import { DestinationFeeModule } from './modules/destination-fee/destination-fee.module';
+
 @Module({
   providers: [
     { provide: APP_PIPE, useClass: DataValidationPipe },

@@ -73,11 +73,15 @@ export class TransactionService {
     return Number(conversionValue.toFixed(2));
   }
 
-  async updatePaidTransactionStatus(updatePaidTransactionStatusDto: UpdatePaidTransactionStatusDto) {
+  async updatePaidTransactionStatus(
+    updatePaidTransactionStatusDto: UpdatePaidTransactionStatusDto,
+    file: Express.Multer.File['path'],
+  ) {
     const { id } = updatePaidTransactionStatusDto;
     const transaction = await this.transactionRepository.findOne({ where: { id } });
     if (!transaction) throw new BadRequestException('there is no transaction with that id');
     transaction.status = TransactionStatus.ONGOING;
+    transaction.photo_path = file;
     await this.transactionRepository.save(transaction);
     return transaction;
   }
