@@ -34,11 +34,15 @@ export class Transaction {
 
   @ApiProperty({ example: 2000 })
   @Column({ type: 'double precision' })
-  total_amount: number;
+  payment_price: number;
 
   @ApiProperty({ example: 'USD' })
   @Column()
   currency: string;
+
+  @ApiProperty({ example: 10 })
+  @Column({ type: 'decimal' })
+  amount_received: number;
 
   @ApiProperty({ example: 0.005 })
   @Column({ type: 'decimal' })

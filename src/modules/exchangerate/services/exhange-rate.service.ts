@@ -39,12 +39,12 @@ export class ExchangeRateService {
     }
   }
 
-  async getConvertedExchangeValue(convertExchangeValueDto: ConvertExchangeValueDto) {
-    const { to_currency, amount_type, destination_country } = convertExchangeValueDto;
+  async getExchangeRate(convertExchangeValueDto: ConvertExchangeValueDto) {
+    const { to_currency, destination_country } = convertExchangeValueDto;
     const exchangeRate = await this.exchangeRepository.findOne({
       where: {
-        from_currency: { currency_signature: amount_type === 'foreign' ? to_currency : 'IDR' },
-        to_currency: { currency_signature: amount_type === 'foreign' ? 'IDR' : to_currency },
+        from_currency: { currency_signature: 'IDR' },
+        to_currency: { currency_signature: to_currency },
       },
     });
     if (!exchangeRate)

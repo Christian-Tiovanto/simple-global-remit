@@ -40,7 +40,7 @@ export class ExchangeRateController {
   @UseGuards(JwtAuthGuard)
   @Get()
   async getConvertedExchangeValue(@Query() convertExchangeValueDto: ConvertExchangeValueDto) {
-    return await this.exchangeService.getConvertedExchangeValue(convertExchangeValueDto);
+    return await this.exchangeService.getExchangeRate(convertExchangeValueDto);
   }
 
   // @ApiOkResponse()

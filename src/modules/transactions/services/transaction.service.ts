@@ -1,8 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Transaction } from '../models/transactions.entity';
 import { EntityManager, Repository } from 'typeorm';
-import { AccountService } from 'src/modules/account/services/account.service';
 import { ExchangeRateService } from 'src/modules/exchangerate/services/exhange-rate.service';
 import { CalculateTransactionAmount } from 'src/interfaces/calculate-transaction-amount';
 import { CreateTransactionDto } from '../dtos/create-transaction.dto';
@@ -12,7 +11,6 @@ import { getDestinationFeeDto } from 'src/modules/destination-fee/dtos/getDestin
 export class TransactionService {
   constructor(
     @InjectRepository(Transaction) private transactionRepository: Repository<Transaction>,
-    private accountService: AccountService,
     private exchangeService: ExchangeRateService,
   ) {}
 
@@ -33,12 +31,12 @@ export class TransactionService {
         },
         { to_country: destination_country, from_country: 'IDN' },
       );
-
+      await this.validateRateFromFE(currency, destination_country, rate);
       const transaction = await entityManager.create(Transaction, {
         user: { id: userId },
         to_account: to_account,
         sender_name,
-        total_amount: formattedAmount,
+        total_amount: Number((formattedAmount + fee).toFixed(2)),
         currency: currency,
         destination_country,
         receiver_name,
@@ -50,6 +48,11 @@ export class TransactionService {
       return transaction;
     });
     return amount;
+  }
+
+  private async validateRateFromFE(currency: string, destination_country: string, rate: number) {
+    const exchangeRate = await this.exchangeService.getExchangeRate({ to_currency: currency, destination_country });
+    if (rate != exchangeRate.rate) throw new BadRequestException(`current exchange rate is ${exchangeRate.rate}`);
   }
 
   private async calculateAmount(
