@@ -13,12 +13,12 @@ import {
 } from '@nestjs/swagger';
 import { SwaggerResponseWrapper } from 'src/utils/api-response-wrapper';
 import { CountryCurrency } from '../model/country-currency.entity';
-import { GetAllCountryAndCurrencyResponse } from '../classes/country.class';
+import { GetAllCountryAndCurrencyRateResponse, GetAllCountryAndCurrencyResponse } from '../classes/country.class';
 import { Role } from 'src/enums/user-role';
 @ApiTags('country')
 @ApiBearerAuth()
 @Controller('api/v1/country')
-@ApiExtraModels(CountryCurrency, GetAllCountryAndCurrencyResponse)
+@ApiExtraModels(CountryCurrency, GetAllCountryAndCurrencyResponse, GetAllCountryAndCurrencyRateResponse)
 export class CountryController {
   constructor(private readonly countryService: CountryService) {}
 
@@ -52,5 +52,17 @@ export class CountryController {
   @Get('all')
   async getAllCountryAndCurrency() {
     return this.countryService.getAllCountryAndCurrency();
+  }
+  @ApiOperation({
+    summary:
+      'use this API to get all the country and their available currency and also their rate. Roles:[admin,client]',
+  })
+  @ApiOkResponse({
+    description: 'use this API to get all the country and their available currency and their rate',
+    schema: SwaggerResponseWrapper.createResponseList(GetAllCountryAndCurrencyRateResponse),
+  })
+  @Get('all/rate')
+  async getAllCountryAndCurrencyRate() {
+    return this.countryService.getAllCountryAndCurrencyRate();
   }
 }

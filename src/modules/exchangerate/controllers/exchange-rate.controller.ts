@@ -14,13 +14,13 @@ import {
 } from '@nestjs/swagger';
 import { SwaggerResponseWrapper } from 'src/utils/api-response-wrapper';
 import { ExchangeRate } from '../models/exchange-rate.entity';
-import { ConvertValueResponse } from '../classes/exchange-rate.class';
+import { ConvertValueResponse, getAllExchangeRateResponse } from '../classes/exchange-rate.class';
 import { UpdateExchangeRateDto } from '../dtos/update-exchange-rate.dto';
 import { Auth } from 'src/decorators/auth.decorator';
 import { Role } from 'src/enums/user-role';
 
 @ApiTags('exchange')
-@ApiExtraModels(ExchangeRate)
+@ApiExtraModels(ExchangeRate, getAllExchangeRateResponse)
 @ApiBearerAuth()
 @Controller('api/v1/rate')
 export class ExchangeRateController {
@@ -51,6 +51,13 @@ export class ExchangeRateController {
   @Get()
   async getConvertedExchangeValue(@Query() convertExchangeValueDto: ConvertExchangeValueDto) {
     return await this.exchangeService.getExchangeRate(convertExchangeValueDto);
+  }
+
+  @ApiOperation({ summary: 'use this API to get all the available exchange rate' })
+  @ApiOkResponse({ schema: SwaggerResponseWrapper.createResponseList(getAllExchangeRateResponse) })
+  @Get('all')
+  async getAllExchangeRate() {
+    return await this.exchangeService.getAllExchangeRate();
   }
 
   @ApiOperation({ summary: 'use this api to update a Exchange Rate. Roles:[admin]' })

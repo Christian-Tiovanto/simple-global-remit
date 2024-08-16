@@ -3,7 +3,14 @@ import { CompanyService } from '../services/company.service';
 import { CreateCompanyBankDto } from '../dtos/create-company-bank.dto';
 import { Auth } from 'src/decorators/auth.decorator';
 import { Role } from 'src/enums/user-role';
-import { ApiCreatedResponse, ApiExtraModels, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiExtraModels,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { SwaggerResponseWrapper } from 'src/utils/api-response-wrapper';
 import { Company } from '../model/company.entity';
 import { GetCompanyBankListResponse } from '../classes/company.class';
@@ -11,6 +18,7 @@ import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { UpdateCompanyBankDto } from '../dtos/update-company-bank.dto';
 @ApiTags('company')
 @Controller('api/v1/company')
+@ApiBearerAuth()
 @ApiExtraModels(Company, GetCompanyBankListResponse, UpdateCompanyBankDto)
 export class CompanyController {
   constructor(private companyService: CompanyService) {}

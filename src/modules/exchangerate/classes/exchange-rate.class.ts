@@ -1,4 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
+import { ExchangeRate } from '../models/exchange-rate.entity';
 
 export class ConvertValueResponse {
   @ApiProperty({
@@ -10,3 +11,5 @@ export class ConvertValueResponse {
   })
   data: number;
 }
+
+export class getAllExchangeRateResponse extends OmitType(ExchangeRate, ['updatedAt', 'createdAt']) {}

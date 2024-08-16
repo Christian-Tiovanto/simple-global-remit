@@ -62,8 +62,11 @@ export class CountryService {
     const result = await this.countryCurrencyRepository.query(sql);
     console.log(result);
     return result;
-    // return await this.countryCurrencyRepository.find({
-    //   relations: { country_currency: true, country_signature: true },
-    // });
+  }
+
+  async getAllCountryAndCurrencyRate() {
+    const sql = `select cc.country_signature,cc.country_currency,er.exchange_rate from country_currency cc left join exchange_rate er on cc.country_currency = er.to_currency_code where er.from_currency_code = 'IDR' and er.to_currency_code != 'IDR'`;
+    const result = await this.countryCurrencyRepository.query(sql);
+    return result;
   }
 }

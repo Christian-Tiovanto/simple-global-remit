@@ -90,4 +90,13 @@ export class ExchangeRateService {
     await this.exchangeRepository.save([updatedRate, invertUpdatedRate]);
     return updatedRate;
   }
+
+  async getAllExchangeRate() {
+    const sql = `select er.from_currency_code,er.to_currency_code  ,er.exchange_rate from exchange_rate er where er.from_currency_code = 'IDR' and er.to_currency_code  != 'IDR'`;
+    // const exchangeRates = await this.exchangeRepository.find({
+    //   where: { from_currency: { currency_signature: 'IDR' }, to_currency: Not('IDR') },
+    // });
+    const exchangeRates = await this.exchangeRepository.query(sql);
+    return exchangeRates;
+  }
 }
