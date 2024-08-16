@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
@@ -39,7 +38,7 @@ import { SwaggerResponseWrapper } from 'src/utils/api-response-wrapper';
 import { TransactionStatus } from 'src/enums/transaction-status';
 import { Auth } from 'src/decorators/auth.decorator';
 import { Role } from 'src/enums/user-role';
-import { getLoggedInUserTransactionQuery } from '../classess/transaction.class';
+import { GetUserTransactionQuery } from '../classess/transaction.class';
 @ApiTags('transaction')
 @ApiBearerAuth()
 @ApiExtraModels(Transaction)
@@ -69,7 +68,7 @@ export class TransactionController {
   })
   @UseGuards(JwtAuthGuard)
   @Get('/me')
-  async getLoggedInUserTransaction(@Request() req, @Query() query: getLoggedInUserTransactionQuery) {
+  async getLoggedInUserTransaction(@Request() req, @Query() query: GetUserTransactionQuery) {
     return await this.transactionService.getUserTransaction(req.user.id, query.status);
   }
   @ApiQuery({
@@ -83,7 +82,7 @@ export class TransactionController {
   })
   @Auth(Role.ADMIN)
   @Get('/:id')
-  async getUserTransaction(@Param('id') id: number, @Query() query: getLoggedInUserTransactionQuery) {
+  async getUserTransaction(@Param('id') id: number, @Query() query: GetUserTransactionQuery) {
     return await this.transactionService.getUserTransaction(id, query.status);
   }
 
@@ -128,15 +127,5 @@ export class TransactionController {
   @Get('all/status/:status')
   async getAllTransactionByStatus(@Param('status') status: TransactionStatus) {
     return await this.transactionService.getAllTransactionByStatus(status);
-  }
-
-  @ApiParam({ name: 'userid', required: true })
-  @ApiParam({ name: 'status', required: true })
-  @ApiOperation({ summary: 'use this API to get all transaction by their status' })
-  @ApiOkResponse({ schema: SwaggerResponseWrapper.createResponseList(Transaction) })
-  // @Auth(Role.ADMIN)
-  @Get('user/:userid/status/:status')
-  async getAllUserTransaction(@Param() params) {
-    return await this.transactionService.getAllUserTransaction(params.userid, params.status);
   }
 }

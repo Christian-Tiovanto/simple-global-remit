@@ -113,15 +113,4 @@ export class TransactionService {
       }
     }
   }
-
-  async getAllUserTransaction(userid: number, status: TransactionStatus) {
-    try {
-      const transactions = await this.transactionRepository.find({ where: { status, user: { id: userid } } });
-      return transactions;
-    } catch (err) {
-      if (err instanceof QueryFailedError && err.driverError.code === '22P02') {
-        throw new BadRequestException('invalid status, please input a valid status(pending,ongoing,sending,completed)');
-      }
-    }
-  }
 }

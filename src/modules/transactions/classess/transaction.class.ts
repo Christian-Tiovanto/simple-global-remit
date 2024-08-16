@@ -1,5 +1,5 @@
 import { TransactionStatus } from 'src/enums/transaction-status';
 
-export class getLoggedInUserTransactionQuery {
+export class GetUserTransactionQuery {
   status: TransactionStatus;
 }
