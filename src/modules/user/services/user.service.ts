@@ -1,11 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, QueryFailedError, Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 import { User } from '../models/user.entity';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { ErrorCode } from 'src/enums/error-code';
 import { DuplicateEmailException } from 'src/exceptions/duplicate-email.exception';
 import { plainToInstance } from 'class-transformer';
+import { Role } from 'src/enums/user-role';
 
 @Injectable()
 export class UserService {
@@ -28,9 +29,15 @@ export class UserService {
     }
   }
 
-  async getAllUser(): Promise<User[]> {
-    const users = await this.usersRepository.find();
-    return plainToInstance(User, users);
+  async getAllUser(role: Role): Promise<User[]> {
+    try {
+      const users = await this.usersRepository.find({ where: { ...(role ? { role } : {}) } });
+      return plainToInstance(User, users);
+    } catch (err) {
+      if (err instanceof QueryFailedError && err.driverError.code === '22P02')
+        throw new BadRequestException('there is no role like that');
+      throw err;
+    }
   }
 
   async getUserbyEmail(email: string): Promise<User> | undefined {

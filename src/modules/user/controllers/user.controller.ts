@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, UseGuards } from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
@@ -9,11 +9,12 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { SwaggerResponseWrapper } from 'src/utils/api-response-wrapper';
 import { User } from '../models/user.entity';
-import { CreateUserResponse, GetUserResponse } from '../classes/user.class';
+import { CreateUserResponse, GetAllUserQuery, GetUserResponse } from '../classes/user.class';
 import { Auth } from 'src/decorators/auth.decorator';
 import { Role } from 'src/enums/user-role';
 @ApiTags('user')
@@ -23,15 +24,20 @@ import { Role } from 'src/enums/user-role';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @ApiOperation({ summary: 'use this API to get All available user. Roles[admin,client' })
+  @ApiOperation({ summary: 'use this API to get All available user. Roles[admin]' })
   @ApiOkResponse({
     description: 'use this API to get All available user',
     schema: SwaggerResponseWrapper.createResponseList(User),
   })
-  @UseGuards(JwtAuthGuard)
+  @ApiQuery({
+    description: 'use the query string for defining the user role',
+    name: 'role',
+    required: false,
+  })
+  // @Auth(Role.ADMIN)
   @Get()
-  async getAllUser() {
-    return await this.userService.getAllUser();
+  async getAllUser(@Query() query: GetAllUserQuery) {
+    return await this.userService.getAllUser(query.role);
   }
 
   @ApiOperation({ summary: 'use this API to create new user. Roles[admin]' })

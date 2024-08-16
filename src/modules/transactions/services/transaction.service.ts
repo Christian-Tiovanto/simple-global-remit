@@ -19,10 +19,16 @@ export class TransactionService {
   ) {}
 
   async getUserTransaction(id: number, status: TransactionStatus) {
-    const transactions = await this.transactionRepository.find({
-      where: { user: { id }, ...(status ? { status } : {}) },
-    });
-    return transactions;
+    try {
+      const transactions = await this.transactionRepository.find({
+        where: { user: { id }, ...(status ? { status } : {}) },
+      });
+      return transactions;
+    } catch (err) {
+      if (err instanceof QueryFailedError && err.driverError.code === '22P02')
+        throw new BadRequestException('invalid transaction status');
+      throw err;
+    }
   }
   async createTransaction(createTransactionDto: CreateTransactionDto, userId: number) {
     const amount = await this.transactionRepository.manager.transaction(async (entityManager: EntityManager) => {
