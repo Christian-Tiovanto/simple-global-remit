@@ -9,6 +9,7 @@ import { getDestinationFeeDto } from 'src/modules/destination-fee/dtos/getDestin
 import { UpdatePaidTransactionStatusDto } from '../dtos/update-paid-transaction-status.dto';
 import { TransactionStatus } from 'src/enums/transaction-status';
 import { UpdateTransactionStatusDto } from '../dtos/update-transaction-status.dto';
+import { generateSerial } from 'src/utils/generate-transaction-id';
 
 @Injectable()
 export class TransactionService {
@@ -47,6 +48,8 @@ export class TransactionService {
         fee,
         rate,
       });
+      await entityManager.save(transaction);
+      transaction.transaction_id = generateSerial(transaction.id);
       await entityManager.save(transaction);
       transaction.user = undefined;
       return transaction;
@@ -92,5 +95,11 @@ export class TransactionService {
     transaction.status = status;
     await this.transactionRepository.save(transaction);
     return transaction;
+  }
+
+  async getTransactionPhoto(id: number) {
+    const transaction = await this.transactionRepository.findOne({ where: { id } });
+    if (!transaction) throw new BadRequestException('there is no transaction with that id');
+    return transaction.photo_path;
   }
 }

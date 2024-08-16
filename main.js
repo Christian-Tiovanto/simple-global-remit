@@ -70,3 +70,17 @@ obj.id = '94';
 obj.status = 'pending';
 
 console.log(obj); // Output: [Object: null prototype] { tes: 'ea', id: '94', status: 'pending' }
+function generateSerial(userId) {
+  const currentTime = Date.now();
+  const paddedUserId = userId.toString();
+  const randomNumber = Math.floor(Math.random() * 1000000)
+    .toString()
+    .padStart(6, '0');
+  const serial = `${currentTime}${paddedUserId}${randomNumber}`;
+  return serial;
+}
+
+// Example usage
+const userId = 123;
+const serial = generateSerial(userId);
+console.log(serial);

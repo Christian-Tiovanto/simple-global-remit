@@ -64,6 +64,10 @@ export class Transaction {
   @Column({ nullable: true })
   photo_path: string;
 
+  @ApiProperty({ example: '172377296141075978339 ' })
+  @Column({ nullable: true })
+  transaction_id: string;
+
   @ApiProperty({ type: Date, format: 'date-time' })
   @CreateDateColumn()
   timeStamp: Date;
