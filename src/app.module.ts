@@ -20,8 +20,8 @@ import { CountryModule } from './modules/country/country.module';
 import { CountryCurrency } from './modules/country/model/country-currency.entity';
 import { DestinationFee } from './modules/destination-fee/model/destination-fee.entity';
 import { DestinationFeeModule } from './modules/destination-fee/destination-fee.module';
-import { Company } from './modules/bank/model/company.entity';
-import { CompanyModule } from './modules/bank/company.module';
+import { Company } from './modules/company/model/company.entity';
+import { CompanyModule } from './modules/company/company.module';
 
 @Module({
   providers: [

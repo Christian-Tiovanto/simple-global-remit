@@ -1,6 +1,6 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { Company } from '../model/company.entity';
-import { CreateCompanyBankDto } from '../dtos/createCompanyBankDto';
+import { CreateCompanyBankDto } from '../dtos/create-company-bank.dto';
 
 class CreateCompanyBankListResponse extends OmitType(CreateCompanyBankDto, ['company_name'] as const) {}
 export class GetCompanyBankListResponse {

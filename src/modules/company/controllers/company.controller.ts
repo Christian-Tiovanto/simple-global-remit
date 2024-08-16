@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
 import { CompanyService } from '../services/company.service';
-import { CreateCompanyBankDto } from '../dtos/createCompanyBankDto';
+import { CreateCompanyBankDto } from '../dtos/create-company-bank.dto';
 import { Auth } from 'src/decorators/auth.decorator';
 import { Role } from 'src/enums/user-role';
 import { ApiCreatedResponse, ApiExtraModels, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -8,11 +8,12 @@ import { SwaggerResponseWrapper } from 'src/utils/api-response-wrapper';
 import { Company } from '../model/company.entity';
 import { GetCompanyBankListResponse } from '../classes/company.class';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { UpdateCompanyBankDto } from '../dtos/update-company-bank.dto';
 @ApiTags('company')
 @Controller('api/v1/company')
-@ApiExtraModels(Company, GetCompanyBankListResponse)
+@ApiExtraModels(Company, GetCompanyBankListResponse, UpdateCompanyBankDto)
 export class CompanyController {
-  constructor(private bankService: CompanyService) {}
+  constructor(private companyService: CompanyService) {}
 
   @ApiOperation({ summary: 'use this API to add the company bank list. Roles[admin]' })
   @ApiCreatedResponse({
@@ -22,7 +23,7 @@ export class CompanyController {
   @Auth(Role.ADMIN)
   @Post()
   async createCompanyBank(@Body() createCompanyBankDto: CreateCompanyBankDto) {
-    return await this.bankService.createCompanyBank(createCompanyBankDto);
+    return await this.companyService.createCompanyBank(createCompanyBankDto);
   }
 
   @ApiOperation({ summary: 'use this API to get all the company bank list. Roles[admin,client]' })
@@ -33,6 +34,14 @@ export class CompanyController {
   @UseGuards(JwtAuthGuard)
   @Get()
   async getCompanyBankList() {
-    return await this.bankService.getCompanyBankList();
+    return await this.companyService.getCompanyBankList();
+  }
+
+  @ApiOperation({ summary: 'use this API to update company bank information. Roles:[admin]' })
+  @ApiOkResponse({ schema: SwaggerResponseWrapper.createResponse(UpdateCompanyBankDto) })
+  @Auth(Role.ADMIN)
+  @Patch()
+  async updateCompanyBank(@Body() updateCompanyBankDto: UpdateCompanyBankDto) {
+    return await this.companyService.updateCompanyBank(updateCompanyBankDto);
   }
 }

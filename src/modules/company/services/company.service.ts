@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from '../model/company.entity';
 import { Repository } from 'typeorm';
-import { CreateCompanyBankDto } from '../dtos/createCompanyBankDto';
+import { CreateCompanyBankDto } from '../dtos/create-company-bank.dto';
+import { UpdateCompanyBankDto } from '../dtos/update-company-bank.dto';
 
 @Injectable()
 export class CompanyService {
@@ -24,5 +25,14 @@ export class CompanyService {
         company_account_type: company.company_account_type,
       })),
     };
+  }
+
+  async updateCompanyBank(updateCompanyBankDto: UpdateCompanyBankDto) {
+    const company = await this.companyRepository.findOne({ where: { id: updateCompanyBankDto.id } });
+    if (!company) throw new BadRequestException('there is no company with that id');
+    delete updateCompanyBankDto['id'];
+    const updatedCompany = Object.assign(company, updateCompanyBankDto);
+    await this.companyRepository.save(updatedCompany);
+    return updatedCompany;
   }
 }
