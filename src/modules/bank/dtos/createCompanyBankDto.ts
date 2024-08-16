@@ -13,4 +13,8 @@ export class CreateCompanyBankDto {
   @ApiProperty({ example: 'Simple Global Remit' })
   @IsString()
   company_account_name: string;
+
+  @ApiProperty({ example: 'BCA' })
+  @IsString()
+  company_account_type: string;
 }

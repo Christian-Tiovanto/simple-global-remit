@@ -3,7 +3,15 @@ import { ExchangeRateService } from '../services/exhange-rate.service';
 import { CreateExchangeDto } from '../dtos/create-exchange.dto';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { ConvertExchangeValueDto } from '../dtos/get-exchange-value.dto';
-import { ApiBearerAuth, ApiCreatedResponse, ApiExtraModels, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiExtraModels,
+  ApiOkResponse,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { SwaggerResponseWrapper } from 'src/utils/api-response-wrapper';
 import { ExchangeRate } from '../models/exchange-rate.entity';
 import { ConvertValueResponse } from '../classes/exchange-rate.class';
@@ -18,16 +26,18 @@ import { Role } from 'src/enums/user-role';
 export class ExchangeRateController {
   constructor(private exchangeService: ExchangeRateService) {}
 
+  @ApiOperation({ summary: 'use this api to create a new Exchange Rate. Roles:[admin]' })
   @ApiCreatedResponse({
     description: 'use this api to create a new Exchange Rate',
     schema: SwaggerResponseWrapper.createResponse(ExchangeRate),
   })
-  @UseGuards(JwtAuthGuard)
+  @Auth(Role.ADMIN)
   @Post()
   async createExchange(@Body() createExchangeDto: CreateExchangeDto) {
     return await this.exchangeService.createExchange(createExchangeDto);
   }
 
+  @ApiOperation({ summary: 'use this api to create a new Exchange Rate. Roles:[admin,client]' })
   @ApiOkResponse({
     description: 'Use this Api to get exchange value',
     type: ConvertValueResponse,
@@ -43,7 +53,7 @@ export class ExchangeRateController {
     return await this.exchangeService.getExchangeRate(convertExchangeValueDto);
   }
 
-  // @ApiOkResponse()
+  @ApiOperation({ summary: 'use this api to update a Exchange Rate. Roles:[admin]' })
   @Auth(Role.ADMIN)
   @Patch('update')
   async updateExchangeRate(@Body() updateExchangeRateDto: UpdateExchangeRateDto) {

@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class Bank {
+export class Company {
   @ApiProperty({ example: 1 })
   @PrimaryGeneratedColumn()
   id: number;
@@ -18,4 +18,8 @@ export class Bank {
   @ApiProperty({ example: 'Simple Global Remit' })
   @Column()
   company_account_name: string;
+
+  @ApiProperty({ example: 'BCA' })
+  @Column()
+  company_account_type: string;
 }

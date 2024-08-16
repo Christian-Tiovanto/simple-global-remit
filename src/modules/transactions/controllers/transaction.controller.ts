@@ -22,6 +22,7 @@ import {
   ApiCreatedResponse,
   ApiExtraModels,
   ApiOkResponse,
+  ApiOperation,
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
@@ -39,6 +40,7 @@ import { SwaggerResponseWrapper } from 'src/utils/api-response-wrapper';
 export class TransactionController {
   constructor(private transactionService: TransactionService) {}
 
+  @ApiOperation({ summary: 'use this API to create a new transcation. Roles[admin,client]' })
   @ApiCreatedResponse({
     description: 'use this API to create a new transcation',
     schema: SwaggerResponseWrapper.createResponse(Transaction),
@@ -49,19 +51,21 @@ export class TransactionController {
     return await this.transactionService.createTransaction(createTransactionQuery, parseInt(req.user.id));
   }
 
+  @ApiOperation({ summary: 'use this API to get logged in user transaction History. Roles[admin,client]' })
   @ApiOkResponse({
     description: 'use this API to get user transaction History',
   })
   @UseGuards(JwtAuthGuard)
-  @Get()
+  @Get('/me')
   async getUserTransactionHistory(@Request() req) {
     return await this.transactionService.getUserTransactionHistory(req.user.id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'use this API to update user transaction status to ongoing. Roles[admin,client]' })
   @UseInterceptors(FileInterceptor('photo'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({ description: 'List Of photo', type: UpdatePaidTransactionStatusDto })
+  @UseGuards(JwtAuthGuard)
   @Patch('pay')
   async updatePaidTransactionStatus(
     @Body() updatePaidTransactionStatusDto: UpdatePaidTransactionStatusDto,
@@ -71,11 +75,17 @@ export class TransactionController {
     return await this.transactionService.updatePaidTransactionStatus(updatePaidTransactionStatusDto, file.path);
   }
 
+  @ApiOperation({ summary: 'use this API to update user transaction status to ongoing. Roles[admin,client]' })
+  @ApiOkResponse({
+    description: 'transaction status patched succesfully',
+    schema: SwaggerResponseWrapper.createResponse(Transaction),
+  })
   @Patch('update')
   async updateTransactionStatus(@Body() updateTransactionStatusDto: UpdateTransactionStatusDto) {
     return await this.transactionService.updateTransactionStatus(updateTransactionStatusDto);
   }
 
+  @ApiOperation({ summary: 'use this API to retrieve transaction Photo. Roles[admin,client]' })
   @ApiOkResponse({ description: 'use this API to retrieve Photo' })
   @ApiParam({ name: 'id', required: true })
   @UseGuards(JwtAuthGuard)
