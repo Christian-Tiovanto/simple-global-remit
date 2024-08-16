@@ -84,3 +84,11 @@ function generateSerial(userId) {
 const userId = 123;
 const serial = generateSerial(userId);
 console.log(serial);
+const a = {
+  length: 1,
+  b: 2,
+};
+const [x, z, ...{ length }] = [1, 2, 4];
+console.log(x, z, length);
+const [o, b, ...{ length2 }] = [1, 2, 3];
+console.log(o, b, length2); // 1 2 1

@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Transaction } from '../models/transactions.entity';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, QueryFailedError, Repository } from 'typeorm';
 import { ExchangeRateService } from 'src/modules/exchangerate/services/exhange-rate.service';
 import { CalculateTransactionAmount } from 'src/interfaces/calculate-transaction-amount';
 import { CreateTransactionDto } from '../dtos/create-transaction.dto';
@@ -18,9 +18,9 @@ export class TransactionService {
     private exchangeService: ExchangeRateService,
   ) {}
 
-  async getUserTransactionHistory(id: number) {
+  async getUserTransaction(id: number, status: TransactionStatus) {
     const transactions = await this.transactionRepository.find({
-      where: { user: { id } },
+      where: { user: { id }, ...(status ? { status } : {}) },
     });
     return transactions;
   }
@@ -101,5 +101,27 @@ export class TransactionService {
     const transaction = await this.transactionRepository.findOne({ where: { id } });
     if (!transaction) throw new BadRequestException('there is no transaction with that id');
     return transaction.photo_path;
+  }
+
+  async getAllTransactionByStatus(status: TransactionStatus) {
+    try {
+      const transactions = await this.transactionRepository.find({ where: { status } });
+      return transactions;
+    } catch (err) {
+      if (err instanceof QueryFailedError && err.driverError.code === '22P02') {
+        throw new BadRequestException('invalid status, please input a valid status(pending,ongoing,sending,completed)');
+      }
+    }
+  }
+
+  async getAllUserTransaction(userid: number, status: TransactionStatus) {
+    try {
+      const transactions = await this.transactionRepository.find({ where: { status, user: { id: userid } } });
+      return transactions;
+    } catch (err) {
+      if (err instanceof QueryFailedError && err.driverError.code === '22P02') {
+        throw new BadRequestException('invalid status, please input a valid status(pending,ongoing,sending,completed)');
+      }
+    }
   }
 }

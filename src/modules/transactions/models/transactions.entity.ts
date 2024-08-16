@@ -61,6 +61,7 @@ export class Transaction {
   @Column({ type: 'enum', enum: TransactionStatus, default: TransactionStatus.PENDING })
   status: TransactionStatus;
 
+  @ApiProperty({ example: 'uploads/te-96d1aa455af18109ef74535b0145109edc.png' })
   @Column({ nullable: true })
   photo_path: string;
 

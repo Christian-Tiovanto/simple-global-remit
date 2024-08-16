@@ -31,11 +31,11 @@ export class CreateTransactionDto {
   @IsAlpha()
   destination_country: string;
 
-  @ApiProperty({ example: 0.005 })
+  @ApiProperty({ example: 40000 })
   @IsNumber()
   fee: number;
 
-  @ApiProperty({ example: 40000 })
+  @ApiProperty({ example: 0.00045 })
   @IsNumber()
   rate: number;
 }

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -7,6 +8,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   Request,
   Res,
   UploadedFile,
@@ -24,6 +26,7 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { Transaction } from '../models/transactions.entity';
@@ -33,6 +36,10 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdatePaidTransactionStatusDto } from '../dtos/update-paid-transaction-status.dto';
 import * as path from 'path';
 import { SwaggerResponseWrapper } from 'src/utils/api-response-wrapper';
+import { TransactionStatus } from 'src/enums/transaction-status';
+import { Auth } from 'src/decorators/auth.decorator';
+import { Role } from 'src/enums/user-role';
+import { getLoggedInUserTransactionQuery } from '../classess/transaction.class';
 @ApiTags('transaction')
 @ApiBearerAuth()
 @ApiExtraModels(Transaction)
@@ -51,14 +58,33 @@ export class TransactionController {
     return await this.transactionService.createTransaction(createTransactionQuery, parseInt(req.user.id));
   }
 
+  @ApiQuery({
+    description: 'use the query string for defining the transaction status',
+    name: 'status',
+    required: false,
+  })
   @ApiOperation({ summary: 'use this API to get logged in user transaction History. Roles[admin,client]' })
   @ApiOkResponse({
     description: 'use this API to get user transaction History',
   })
   @UseGuards(JwtAuthGuard)
   @Get('/me')
-  async getUserTransactionHistory(@Request() req) {
-    return await this.transactionService.getUserTransactionHistory(req.user.id);
+  async getLoggedInUserTransaction(@Request() req, @Query() query: getLoggedInUserTransactionQuery) {
+    return await this.transactionService.getUserTransaction(req.user.id, query.status);
+  }
+  @ApiQuery({
+    description: 'use the query string for defining the transaction status',
+    name: 'status',
+    required: false,
+  })
+  @ApiOperation({ summary: 'use this API to get specific user transaction History. Roles[admin]' })
+  @ApiOkResponse({
+    description: 'use this API to get user transaction History',
+  })
+  @Auth(Role.ADMIN)
+  @Get('/:id')
+  async getUserTransaction(@Param('id') id: number, @Query() query: getLoggedInUserTransactionQuery) {
+    return await this.transactionService.getUserTransaction(id, query.status);
   }
 
   @ApiOperation({ summary: 'use this API to update user transaction status to ongoing. Roles[admin,client]' })
@@ -94,5 +120,23 @@ export class TransactionController {
     console.log(id);
     const photoPath = await this.transactionService.getTransactionPhoto(id);
     res.sendFile(path.resolve(`./${photoPath}`));
+  }
+
+  @ApiOperation({ summary: 'use this API to get all transaction by their status' })
+  @ApiOkResponse({ schema: SwaggerResponseWrapper.createResponseList(Transaction) })
+  @Auth(Role.ADMIN)
+  @Get('all/status/:status')
+  async getAllTransactionByStatus(@Param('status') status: TransactionStatus) {
+    return await this.transactionService.getAllTransactionByStatus(status);
+  }
+
+  @ApiParam({ name: 'userid', required: true })
+  @ApiParam({ name: 'status', required: true })
+  @ApiOperation({ summary: 'use this API to get all transaction by their status' })
+  @ApiOkResponse({ schema: SwaggerResponseWrapper.createResponseList(Transaction) })
+  // @Auth(Role.ADMIN)
+  @Get('user/:userid/status/:status')
+  async getAllUserTransaction(@Param() params) {
+    return await this.transactionService.getAllUserTransaction(params.userid, params.status);
   }
 }
