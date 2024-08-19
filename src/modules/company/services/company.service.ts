@@ -35,4 +35,8 @@ export class CompanyService {
     await this.companyRepository.save(updatedCompany);
     return updatedCompany;
   }
+
+  async deleteCompanyBank(id: number) {
+    const company = await this.companyRepository.delete({ id });
+  }
 }

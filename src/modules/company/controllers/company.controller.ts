@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { CompanyService } from '../services/company.service';
 import { CreateCompanyBankDto } from '../dtos/create-company-bank.dto';
 import { Auth } from 'src/decorators/auth.decorator';
@@ -9,6 +9,7 @@ import {
   ApiExtraModels,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
 import { SwaggerResponseWrapper } from 'src/utils/api-response-wrapper';
@@ -51,5 +52,13 @@ export class CompanyController {
   @Patch()
   async updateCompanyBank(@Body() updateCompanyBankDto: UpdateCompanyBankDto) {
     return await this.companyService.updateCompanyBank(updateCompanyBankDto);
+  }
+
+  @ApiOperation({ summary: 'use this API to delete spesific company bank row. Roles[admin]' })
+  @ApiParam({ name: 'id', required: true })
+  @Delete(':id')
+  // @Auth(Role.ADMIN)
+  async deleteCompanyBank(@Param('id') id: number) {
+    await this.companyService.deleteCompanyBank(id);
   }
 }
