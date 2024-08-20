@@ -4,6 +4,8 @@ import { LoginDto } from '../dtos/login.dto';
 import { ApiCreatedResponse, ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtTokenResponse } from '../classes/auth.class';
 import { SwaggerResponseWrapper } from 'src/utils/api-response-wrapper';
+import { CreateUserDto } from 'src/modules/user/dtos/create-user.dto';
+import { CreateUserResponse } from 'src/modules/user/classes/user.class';
 
 @ApiTags('auth')
 @Controller('api/v1/user')
@@ -19,5 +21,15 @@ export class AuthController {
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
+  }
+
+  @ApiOperation({ summary: 'use this API to create new user. Roles[admin,client]' })
+  @ApiCreatedResponse({
+    description: 'use this API to create new user',
+    schema: SwaggerResponseWrapper.createResponse(CreateUserResponse),
+  })
+  @Post('register')
+  async register(@Body() createUserDto: CreateUserDto) {
+    return this.authService.register(createUserDto);
   }
 }

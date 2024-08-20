@@ -37,4 +37,12 @@ export class User {
 
   @Column({ type: 'enum', enum: Role, default: Role.CLIENT })
   role: Role;
+
+  @Column({ select: false })
+  @Exclude()
+  otp_secret_key!: string;
+
+  @ApiProperty({ example: false })
+  @Column({ default: false })
+  is_verified: boolean;
 }
