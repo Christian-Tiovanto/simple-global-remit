@@ -50,4 +50,8 @@ export class UserService {
     if (!user) throw new BadRequestException('there is no user with that id');
     return plainToInstance(User, user);
   }
+
+  async saveUser(user: User) {
+    await this.usersRepository.save(user);
+  }
 }

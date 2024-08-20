@@ -38,7 +38,7 @@ export class User {
   @Column({ type: 'enum', enum: Role, default: Role.CLIENT })
   role: Role;
 
-  @Column({ select: false })
+  @Column()
   @Exclude()
   otp_secret_key!: string;
 

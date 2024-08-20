@@ -23,6 +23,4 @@ export class CreateUserDto {
   @IsEnum(Role)
   @IsOptional()
   role: Role;
-
-  otp_secret_key: string;
 }

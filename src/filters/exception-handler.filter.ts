@@ -15,6 +15,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
+    console.log(exception);
     switch (true) {
       case exception instanceof BaseValidationException:
         response.status(HttpStatus.BAD_REQUEST);
