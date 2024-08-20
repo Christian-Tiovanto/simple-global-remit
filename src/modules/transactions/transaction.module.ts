@@ -10,6 +10,7 @@ import { ExchangeRateModule } from '../exchangerate/exchangerate.module';
 import { MulterModule } from '@nestjs/platform-express';
 import * as path from 'path';
 import { diskStorage } from 'multer';
+import { TransactionLogModule } from '../transaction-log/transaction-log.module';
 const storage = diskStorage({
   destination: './uploads',
   filename: (req, file, cb) => {
@@ -29,6 +30,7 @@ const storage = diskStorage({
     AccountModule,
     CurrencyModule,
     ExchangeRateModule,
+    TransactionLogModule,
     MulterModule.register({ storage }),
   ],
   providers: [TransactionService],

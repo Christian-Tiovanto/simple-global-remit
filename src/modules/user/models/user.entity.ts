@@ -38,8 +38,8 @@ export class User {
   @Column({ type: 'enum', enum: Role, default: Role.CLIENT })
   role: Role;
 
-  @Column()
   @Exclude()
+  @Column({ default: '' })
   otp_secret_key!: string;
 
   @ApiProperty({ example: false })

@@ -10,12 +10,14 @@ import { UpdatePaidTransactionStatusDto } from '../dtos/update-paid-transaction-
 import { TransactionStatus } from 'src/enums/transaction-status';
 import { UpdateTransactionStatusDto } from '../dtos/update-transaction-status.dto';
 import { generateSerial } from 'src/utils/generate-transaction-id';
+import { TransactionLogService } from 'src/modules/transaction-log/services/transaction-log.service';
 
 @Injectable()
 export class TransactionService {
   constructor(
     @InjectRepository(Transaction) private transactionRepository: Repository<Transaction>,
     private exchangeService: ExchangeRateService,
+    private transactionLogService: TransactionLogService,
   ) {}
 
   async getUserTransaction(id: number, status: TransactionStatus) {
@@ -85,21 +87,28 @@ export class TransactionService {
   async updatePaidTransactionStatus(
     updatePaidTransactionStatusDto: UpdatePaidTransactionStatusDto,
     file: Express.Multer.File['path'],
+    userId: number,
   ) {
     const { id } = updatePaidTransactionStatusDto;
     const transaction = await this.transactionRepository.findOne({ where: { id } });
     if (!transaction) throw new BadRequestException('there is no transaction with that id');
-    transaction.status = TransactionStatus.ONGOING;
+    const status = TransactionStatus.ONGOING;
+    const previous_state = transaction.status;
+    console.log(previous_state);
+    transaction.status = status;
     transaction.photo_path = file;
     await this.transactionRepository.save(transaction);
+    await this.transactionLogService.createTransactionLog(transaction, previous_state, userId);
     return transaction;
   }
-  async updateTransactionStatus(updateTransactionStatusDto: UpdateTransactionStatusDto) {
+  async updateTransactionStatus(updateTransactionStatusDto: UpdateTransactionStatusDto, userId: number) {
     const { id, status } = updateTransactionStatusDto;
     const transaction = await this.transactionRepository.findOne({ where: { id } });
     if (!transaction) throw new BadRequestException('there is no transaction with that id');
+    const previous_state = transaction.status;
     transaction.status = status;
     await this.transactionRepository.save(transaction);
+    await this.transactionLogService.createTransactionLog(transaction, previous_state, userId);
     return transaction;
   }
 

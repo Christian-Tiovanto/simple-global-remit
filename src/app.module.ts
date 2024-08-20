@@ -22,6 +22,8 @@ import { DestinationFee } from './modules/destination-fee/model/destination-fee.
 import { DestinationFeeModule } from './modules/destination-fee/destination-fee.module';
 import { Company } from './modules/company/model/company.entity';
 import { CompanyModule } from './modules/company/company.module';
+import { TransactionLogModule } from './modules/transaction-log/transaction-log.module';
+import { TransactionLog } from './modules/transaction-log/models/transaction-log.entity';
 
 @Module({
   providers: [
@@ -37,7 +39,18 @@ import { CompanyModule } from './modules/company/company.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [Currency, User, Transaction, Account, ExchangeRate, Country, CountryCurrency, DestinationFee, Company],
+      entities: [
+        Currency,
+        User,
+        Transaction,
+        Account,
+        ExchangeRate,
+        Country,
+        CountryCurrency,
+        DestinationFee,
+        Company,
+        TransactionLog,
+      ],
       synchronize: true,
     }),
     CurrencyModule,
@@ -49,6 +62,7 @@ import { CompanyModule } from './modules/company/company.module';
     CountryModule,
     DestinationFeeModule,
     CompanyModule,
+    TransactionLogModule,
   ],
 })
 export class AppModule {}

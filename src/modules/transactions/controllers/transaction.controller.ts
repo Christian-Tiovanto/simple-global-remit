@@ -39,6 +39,7 @@ import { TransactionStatus } from 'src/enums/transaction-status';
 import { Auth } from 'src/decorators/auth.decorator';
 import { Role } from 'src/enums/user-role';
 import { GetUserTransactionQuery } from '../classess/transaction.class';
+import { User } from 'src/decorators/user.decorator';
 @ApiTags('transaction')
 @ApiBearerAuth()
 @ApiExtraModels(Transaction)
@@ -93,11 +94,16 @@ export class TransactionController {
   @UseGuards(JwtAuthGuard)
   @Patch('pay')
   async updatePaidTransactionStatus(
+    @User() user,
     @Body() updatePaidTransactionStatusDto: UpdatePaidTransactionStatusDto,
     @UploadedFile(new ParseFilePipeBuilder().addFileTypeValidator({ fileType: 'image/*' }).build())
     file: Express.Multer.File,
   ) {
-    return await this.transactionService.updatePaidTransactionStatus(updatePaidTransactionStatusDto, file.path);
+    return await this.transactionService.updatePaidTransactionStatus(
+      updatePaidTransactionStatusDto,
+      file.path,
+      user.id,
+    );
   }
 
   @ApiOperation({ summary: 'use this API to update user transaction status to ongoing. Roles[admin,client]' })
@@ -105,9 +111,10 @@ export class TransactionController {
     description: 'transaction status patched succesfully',
     schema: SwaggerResponseWrapper.createResponse(Transaction),
   })
+  @Auth(Role.ADMIN)
   @Patch('update')
-  async updateTransactionStatus(@Body() updateTransactionStatusDto: UpdateTransactionStatusDto) {
-    return await this.transactionService.updateTransactionStatus(updateTransactionStatusDto);
+  async updateTransactionStatus(@User() user, @Body() updateTransactionStatusDto: UpdateTransactionStatusDto) {
+    return await this.transactionService.updateTransactionStatus(updateTransactionStatusDto, user.id);
   }
 
   @ApiOperation({ summary: 'use this API to retrieve transaction Photo. Roles[admin,client]' })
