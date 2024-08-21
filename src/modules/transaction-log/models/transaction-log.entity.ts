@@ -8,7 +8,7 @@ export class TransactionLog {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'enum', enum: TransactionStatus })
+  @Column({ type: 'enum', enum: TransactionStatus, nullable: true })
   previous_state: string;
 
   @Column({ type: 'enum', enum: TransactionStatus })

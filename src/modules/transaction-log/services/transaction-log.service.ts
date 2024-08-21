@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionLog } from '../models/transaction-log.entity';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { Transaction } from 'src/modules/transactions/models/transactions.entity';
 import { TransactionStatus } from 'src/enums/transaction-status';
 
@@ -17,6 +17,22 @@ export class TransactionLogService {
       modified_by: { id: modifier_id },
     });
     await this.transactionLogRepository.save(transactionLog);
+    return transactionLog;
+  }
+
+  async createTransactionLogWithManager(
+    manager: EntityManager,
+    transaction: Transaction,
+    previous_state: TransactionStatus,
+    modifier_id: number,
+  ) {
+    const transactionLog = await manager.create(TransactionLog, {
+      transaction: transaction,
+      previous_state: previous_state,
+      current_state: transaction.status,
+      modified_by: { id: modifier_id },
+    });
+    await manager.save(transactionLog);
     return transactionLog;
   }
 

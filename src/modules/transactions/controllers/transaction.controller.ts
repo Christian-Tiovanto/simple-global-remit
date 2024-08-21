@@ -82,7 +82,7 @@ export class TransactionController {
     description: 'use this API to get user transaction History',
   })
   @Auth(Role.ADMIN)
-  @Get('/:id')
+  @Get('/user/:id')
   async getUserTransaction(@Param('id') id: number, @Query() query: GetUserTransactionQuery) {
     return await this.transactionService.getUserTransaction(id, query.status);
   }

@@ -38,7 +38,6 @@ export class AuthService {
     const { otp, secret } = generateOtpAndSecret();
     user.otp_secret_key = secret;
     await this.userService.saveUser(user);
-    console.log(user);
     sendMail(email, 'Your OTP Verification Code', otp);
     return { otp };
   }

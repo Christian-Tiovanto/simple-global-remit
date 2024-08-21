@@ -59,6 +59,7 @@ export class TransactionService {
       await entityManager.save(transaction);
       transaction.transaction_id = generateSerial(transaction.id);
       await entityManager.save(transaction);
+      await this.transactionLogService.createTransactionLogWithManager(entityManager, transaction, undefined, userId);
       transaction.user = undefined;
       return transaction;
     });
