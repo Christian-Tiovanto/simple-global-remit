@@ -57,18 +57,3 @@ export class UserController {
     return await this.userService.getLoggedInUserProfile(user.id);
   }
 }
-function firstElement1<Type>(arr: Type[]) {
-  return arr[0];
-}
-const a = firstElement1([1, 2, 3]);
-interface tes<a> {
-  asem: a;
-}
-const ac: tes<string> = {
-  asem: 'ea',
-};
-
-function f(n?: number) {
-  console.log(n.toFixed()); // 0 arguments
-  console.log(n.toFixed(3)); // 1 argument
-}

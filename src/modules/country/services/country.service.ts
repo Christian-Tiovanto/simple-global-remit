@@ -58,7 +58,7 @@ export class CountryService {
   }
 
   async getAllCountryAndCurrency() {
-    const sql = `select c.country_signature ,c.country_name,cc.fee,array_agg(cc.country_currency ) country_currency from country c left join country_currency cc on c.country_signature  = cc.country_signature group by c.country_signature, cc.fee`;
+    const sql = `select c.country_signature ,c.country_name,cc.fee,jsonb_agg(jsonb_build_object('currency_signature',cc.country_currency,'exchange_rate',er.exchange_rate,'currency_name',c2.currency_name)) country_currency from country c left join country_currency cc on c.country_signature  = cc.country_signature left join currency c2 on cc.country_currency = c2.currency_signature left join exchange_rate er on cc.country_currency = er.to_currency_code where er.from_currency_code = 'IDR' and er.to_currency_code != 'IDR' group by c.country_signature ,cc.fee  `;
     const result = await this.countryCurrencyRepository.query(sql);
     return result;
   }
