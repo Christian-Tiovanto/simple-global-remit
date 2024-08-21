@@ -11,6 +11,7 @@ import { TransactionStatus } from 'src/enums/transaction-status';
 import { UpdateTransactionStatusDto } from '../dtos/update-transaction-status.dto';
 import { generateSerial } from 'src/utils/generate-transaction-id';
 import { TransactionLogService } from 'src/modules/transaction-log/services/transaction-log.service';
+import { ValidationError } from 'src/exceptions/validation-error.exception';
 
 @Injectable()
 export class TransactionService {
@@ -68,7 +69,11 @@ export class TransactionService {
 
   private async validateRateFromFE(currency: string, destination_country: string, rate: number) {
     const exchangeRate = await this.exchangeService.getExchangeRate({ to_currency: currency, destination_country });
-    if (rate != exchangeRate.rate) throw new BadRequestException(`current exchange rate is ${exchangeRate.rate}`);
+    if (rate != exchangeRate.rate)
+      throw new ValidationError(`current exchange rate is ${exchangeRate.rate}`, {
+        key: ['exchange_rate'],
+        value: [rate],
+      });
   }
 
   private async calculateAmount(
@@ -128,5 +133,13 @@ export class TransactionService {
         throw new BadRequestException('invalid status, please input a valid status(pending,ongoing,sending,completed)');
       }
     }
+  }
+
+  async getLoggedInUserSpesificTransaction(userId: number, transactionId: number) {
+    const transaction = await this.transactionRepository.findOne({
+      where: { user: { id: userId }, id: transactionId },
+    });
+    if (!transaction) throw new BadRequestException('there is no transaction with that id');
+    return transaction;
   }
 }

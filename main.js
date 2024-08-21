@@ -35,3 +35,5 @@ function fetchData() {
     }, 0);
   });
 }
+
+if ([]) console.log('asofkasodkfass');

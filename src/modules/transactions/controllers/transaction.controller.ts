@@ -135,4 +135,12 @@ export class TransactionController {
   async getAllTransactionByStatus(@Param('status') status: TransactionStatus) {
     return await this.transactionService.getAllTransactionByStatus(status);
   }
+
+  @ApiOperation({ summary: 'use this API to get Logged In User spesific transaction' })
+  @ApiOkResponse({ schema: SwaggerResponseWrapper.createResponse(Transaction) })
+  @UseGuards(JwtAuthGuard)
+  @Get('me/transaction/:id')
+  async getLoggedInUserSpesificTransaction(@User() user, @Param('id') transactionId: number) {
+    return await this.transactionService.getLoggedInUserSpesificTransaction(user.id, transactionId);
+  }
 }
