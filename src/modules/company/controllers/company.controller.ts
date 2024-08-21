@@ -10,6 +10,7 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { SwaggerResponseWrapper } from 'src/utils/api-response-wrapper';
@@ -56,8 +57,9 @@ export class CompanyController {
 
   @ApiOperation({ summary: 'use this API to delete spesific company bank row. Roles[admin]' })
   @ApiParam({ name: 'id', required: true })
+  @ApiResponse({ status: 204 })
+  @Auth(Role.ADMIN)
   @Delete(':id')
-  // @Auth(Role.ADMIN)
   async deleteCompanyBank(@Param('id') id: number) {
     await this.companyService.deleteCompanyBank(id);
   }

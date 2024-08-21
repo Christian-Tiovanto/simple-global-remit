@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QueryFailedError, Repository } from 'typeorm';
 import { User } from '../models/user.entity';
@@ -47,11 +47,17 @@ export class UserService {
 
   async getUserbyId(id: number): Promise<User> | undefined {
     const user = await this.usersRepository.findOne({ where: { id } });
-    if (!user) throw new BadRequestException('there is no user with that id');
+    if (!user) throw new NotFoundException('there is no user with that id');
     return plainToInstance(User, user);
   }
 
   async saveUser(user: User) {
     await this.usersRepository.save(user);
+  }
+
+  async getLoggedInUserProfile(id: number) {
+    const user = await this.usersRepository.findOne({ where: { id } });
+    if (!user) throw new NotFoundException('there is no user with that id');
+    return user;
   }
 }

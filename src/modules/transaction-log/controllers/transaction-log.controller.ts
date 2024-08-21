@@ -6,7 +6,7 @@ import { ApiTags } from '@nestjs/swagger';
 export class TransactionLogController {
   constructor(private transactionLogService: TransactionLogService) {}
 
-  @ApiTags('logs')
+  @ApiTags('Transactoin Logs')
   @Get(':id')
   async getTransactionLogsByTransactionId(@Param('id', ParseIntPipe) id: number) {
     return await this.transactionLogService.getTransactionLogsByTransactionId(id);

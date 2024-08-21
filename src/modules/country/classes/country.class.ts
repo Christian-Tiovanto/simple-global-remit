@@ -5,6 +5,9 @@ import { CountryCurrency } from '../model/country-currency.entity';
 export class GetAllCountryAndCurrencyResponse extends Country {
   @ApiProperty({ type: [String], example: ['USD', 'EUR'] })
   country_currency: CountryCurrency[];
+
+  @ApiProperty({ example: 40000 })
+  fee: number;
 }
 export class GetAllCountryAndCurrencyRateResponse extends Country {
   @ApiProperty({ example: 0.00045 })

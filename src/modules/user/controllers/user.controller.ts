@@ -11,8 +11,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { SwaggerResponseWrapper } from 'src/utils/api-response-wrapper';
-import { User } from '../models/user.entity';
+import { User as UserEntity } from '../models/user.entity';
 import { CreateUserResponse, GetAllUserQuery, GetUserResponse } from '../classes/user.class';
+import { User } from 'src/decorators/user.decorator';
 @ApiTags('user')
 @ApiBearerAuth()
 @ApiExtraModels(CreateUserResponse, GetUserResponse)
@@ -23,7 +24,7 @@ export class UserController {
   @ApiOperation({ summary: 'use this API to get All available user. Roles[admin]' })
   @ApiOkResponse({
     description: 'use this API to get All available user',
-    schema: SwaggerResponseWrapper.createResponseList(User),
+    schema: SwaggerResponseWrapper.createResponseList(UserEntity),
   })
   @ApiQuery({
     description: 'use the query string for defining the user role',
@@ -47,4 +48,27 @@ export class UserController {
   async getUserbyId(@Param('id', ParseIntPipe) id: number) {
     return await this.userService.getUserbyId(id);
   }
+
+  @ApiOperation({ summary: 'use this API to get logged in user profile. Roles[admin,client]' })
+  @ApiOkResponse({ schema: SwaggerResponseWrapper.createResponse(GetUserResponse) })
+  @UseGuards(JwtAuthGuard)
+  @Get('/me/profile')
+  async getLoggedInUserProfile(@User() user) {
+    return await this.userService.getLoggedInUserProfile(user.id);
+  }
+}
+function firstElement1<Type>(arr: Type[]) {
+  return arr[0];
+}
+const a = firstElement1([1, 2, 3]);
+interface tes<a> {
+  asem: a;
+}
+const ac: tes<string> = {
+  asem: 'ea',
+};
+
+function f(n?: number) {
+  console.log(n.toFixed()); // 0 arguments
+  console.log(n.toFixed(3)); // 1 argument
 }

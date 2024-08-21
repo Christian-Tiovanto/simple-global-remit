@@ -66,6 +66,7 @@ export class TransactionController {
   @ApiOperation({ summary: 'use this API to get logged in user transaction History. Roles[admin,client]' })
   @ApiOkResponse({
     description: 'use this API to get user transaction History',
+    schema: SwaggerResponseWrapper.createResponseList(Transaction),
   })
   @UseGuards(JwtAuthGuard)
   @Get('/me')
@@ -80,6 +81,7 @@ export class TransactionController {
   @ApiOperation({ summary: 'use this API to get specific user transaction History. Roles[admin]' })
   @ApiOkResponse({
     description: 'use this API to get user transaction History',
+    schema: SwaggerResponseWrapper.createResponseList(Transaction),
   })
   @Auth(Role.ADMIN)
   @Get('/user/:id')
@@ -91,6 +93,7 @@ export class TransactionController {
   @UseInterceptors(FileInterceptor('photo'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({ description: 'List Of photo', type: UpdatePaidTransactionStatusDto })
+  @ApiOkResponse({ schema: SwaggerResponseWrapper.createResponse(Transaction) })
   @UseGuards(JwtAuthGuard)
   @Patch('pay')
   async updatePaidTransactionStatus(

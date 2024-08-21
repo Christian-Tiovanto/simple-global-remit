@@ -37,7 +37,7 @@ export class ExchangeRateController {
     return await this.exchangeService.createExchange(createExchangeDto);
   }
 
-  @ApiOperation({ summary: 'use this api to create a new Exchange Rate. Roles:[admin,client]' })
+  @ApiOperation({ summary: 'use this api to get Exchange Rate. Roles:[admin,client]' })
   @ApiOkResponse({
     description: 'Use this Api to get exchange value',
     type: ConvertValueResponse,

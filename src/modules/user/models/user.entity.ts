@@ -23,7 +23,7 @@ export class User {
 
   @ApiProperty({ required: false })
   @Column({ default: true })
-  isActive: boolean;
+  is_active: boolean;
 
   @BeforeInsert()
   async hashPassword() {

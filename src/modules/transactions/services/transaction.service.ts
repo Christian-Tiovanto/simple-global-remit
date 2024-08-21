@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Transaction } from '../models/transactions.entity';
 import { EntityManager, QueryFailedError, Repository } from 'typeorm';
 import { ExchangeRateService } from 'src/modules/exchangerate/services/exhange-rate.service';
-import { CalculateTransactionAmount } from 'src/interfaces/calculate-transaction-amount';
+import { CalculateTransactionAmount } from 'src/interfaces/calculate-transaction-amount.interface';
 import { CreateTransactionDto } from '../dtos/create-transaction.dto';
 import { getDestinationFeeDto } from 'src/modules/destination-fee/dtos/getDestinationFee.dto';
 import { UpdatePaidTransactionStatusDto } from '../dtos/update-paid-transaction-status.dto';

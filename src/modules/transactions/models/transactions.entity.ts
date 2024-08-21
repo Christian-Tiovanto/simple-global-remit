@@ -45,11 +45,11 @@ export class Transaction {
   @Column({ type: 'decimal' })
   amount_received: number;
 
-  @ApiProperty({ example: 0.005 })
+  @ApiProperty({ example: '0.005' })
   @Column({ type: 'decimal' })
   rate: number;
 
-  @ApiProperty({ example: 40000 })
+  @ApiProperty({ example: '40000' })
   @Column({ type: 'decimal' })
   fee: number;
 

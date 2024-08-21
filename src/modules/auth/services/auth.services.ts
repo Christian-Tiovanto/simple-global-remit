@@ -8,6 +8,7 @@ import { generateOtpAndSecret } from 'src/utils/otp-generator';
 import { sendMail } from 'src/utils/send-mail';
 import { authenticator } from 'otplib';
 import { VerifyUserDto } from '../dtos/verify-user.dto';
+import { JwtPayload } from 'src/interfaces/jwt-payload.interface';
 @Injectable()
 export class AuthService {
   constructor(
@@ -18,10 +19,13 @@ export class AuthService {
     const user = await this.userService.getUserbyEmail(loginDto.email);
     if (!user || !(await bcrypt.compare(loginDto.password.toString(), user ? user.password : 'null')))
       throw new UnauthorizedException('Invalid Email | password');
-    const token = await this.jwtService.sign(
-      { email: user.email, id: user.id, role: user.role },
-      { secret: process.env.JWT_SECRET },
-    );
+    const payload: JwtPayload = {
+      email: user.email,
+      id: user.id,
+      role: user.role,
+      is_verified: user.is_verified,
+    };
+    const token = await this.jwtService.sign(payload, { secret: process.env.JWT_SECRET });
     return {
       message: 'Login Successfull',
       token,

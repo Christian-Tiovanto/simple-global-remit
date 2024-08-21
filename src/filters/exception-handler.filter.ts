@@ -6,6 +6,7 @@ import {
   HttpStatus,
   BadRequestException,
   UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { BaseConflictException, BaseValidationException } from 'src/exceptions/base.exception';
@@ -31,6 +32,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
         break;
       case exception instanceof BadRequestException:
         response.status(HttpStatus.BAD_REQUEST);
+        this.toJson(exception, response);
+        break;
+      case exception instanceof NotFoundException:
+        response.status(HttpStatus.NOT_FOUND);
         this.toJson(exception, response);
         break;
       case exception instanceof UnauthorizedException:

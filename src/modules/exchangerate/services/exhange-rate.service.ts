@@ -4,7 +4,7 @@ import { ExchangeRate } from '../models/exchange-rate.entity';
 import { Repository } from 'typeorm';
 import { CreateExchangeDto } from '../dtos/create-exchange.dto';
 import { ConvertExchangeValueDto } from '../dtos/get-exchange-value.dto';
-import { CalculateTransactionAmount } from 'src/interfaces/calculate-transaction-amount';
+import { CalculateTransactionAmount } from 'src/interfaces/calculate-transaction-amount.interface';
 import { getConstraintError } from 'src/utils/get-error-constraint';
 import { ExchangeRateColumnName } from 'src/enums/country-column';
 import { DestinationFeeService } from 'src/modules/destination-fee/services/destination-fee.service';

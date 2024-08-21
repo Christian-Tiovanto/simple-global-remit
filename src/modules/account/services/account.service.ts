@@ -6,8 +6,8 @@ import { CreateAccountDto } from '../dtos/create-account.dto';
 import { ErrorCode } from 'src/enums/error-code';
 import { DuplicateAccountException } from 'src/exceptions/duplicate-account.exception';
 import { UserService } from 'src/modules/user/services/user.service';
-import { AccountListTransaction } from 'src/interfaces/account-list-transaction';
-import { TransactionAmountUpdate } from 'src/interfaces/transaction-amount-update';
+import { AccountListTransaction } from 'src/interfaces/account-list-transaction.interface';
+import { TransactionAmountUpdate } from 'src/interfaces/transaction-amount-update.interface';
 
 @Injectable()
 export class AccountService {
