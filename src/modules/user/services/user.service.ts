@@ -58,6 +58,6 @@ export class UserService {
   async getLoggedInUserProfile(id: number) {
     const user = await this.usersRepository.findOne({ where: { id } });
     if (!user) throw new NotFoundException('there is no user with that id');
-    return user;
+    return plainToInstance(User, user);
   }
 }

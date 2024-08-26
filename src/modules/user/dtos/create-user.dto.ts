@@ -9,11 +9,11 @@ export class CreateUserDto {
 
   @ApiProperty({ example: 'testing' })
   @IsString()
-  firstName: string;
+  first_name: string;
 
   @ApiProperty({ example: 'testing last name' })
   @IsString()
-  lastName: string;
+  last_name: string;
 
   @ApiProperty({ example: 'testing' })
   @IsString()

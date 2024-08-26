@@ -14,12 +14,12 @@ export class User {
   email: string;
 
   @ApiProperty({ example: 'christian' })
-  @Column()
-  firstName: string;
+  @Column({ name: 'first_name' })
+  first_name: string;
 
   @ApiProperty({ example: 'tiovanto' })
-  @Column({ type: 'varchar' })
-  lastName: string;
+  @Column({ type: 'varchar', name: 'last_name' })
+  last_name: string;
 
   @ApiProperty({ required: false })
   @Column({ default: true })

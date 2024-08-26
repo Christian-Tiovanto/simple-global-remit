@@ -50,7 +50,7 @@ export class TransactionService {
         to_account: to_account,
         sender_name,
         payment_price: Number((amount + fee).toFixed(2)),
-        amount_received: Number(formattedAmount.toFixed(2)),
+        amount_received: Number(amount.toFixed(2)),
         currency: currency,
         destination_country,
         receiver_name,
