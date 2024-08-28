@@ -10,7 +10,7 @@ import { authenticator } from 'otplib';
 import { VerifyUserDto } from '../dtos/verify-user.dto';
 import { JwtPayload } from 'src/interfaces/jwt-payload.interface';
 import { UserNotificationService } from 'src/modules/user-notification-token/services/user-notification.service';
-import { CreateUserNotificationDto } from 'src/modules/user-notification-token/dtos/create-user-notification.dto';
+import { RegisterUserNotificationDto } from 'src/modules/user-notification-token/dtos/create-user-notification.dto';
 import { User } from 'src/modules/user/models/user.entity';
 @Injectable()
 export class AuthService {
@@ -30,20 +30,21 @@ export class AuthService {
       is_verified: user.is_verified,
     };
     const token = await this.jwtService.sign(payload, { secret: process.env.JWT_SECRET });
-    await this.createUserNotificationLogin(user.id, loginDto.token);
+    await this.registerUserNotificationLogin(user.id, loginDto.token);
     return {
       message: 'Login Successfull',
       token,
     };
   }
 
-  private async createUserNotificationLogin(id: User['id'], token: LoginDto['token']) {
-    const userNotificationDto: CreateUserNotificationDto = {
+  private async registerUserNotificationLogin(id: User['id'], token: LoginDto['token']) {
+    const userNotificationDto: RegisterUserNotificationDto = {
       user_id: id,
       token: token,
     };
-    await this.userNotificationService.createUserNotificationToken(userNotificationDto);
+    await this.userNotificationService.registerUserNotificationToken(userNotificationDto);
   }
+
   async register(createUserDto: CreateUserDto) {
     const user = await this.userService.createUser(createUserDto);
     return user;

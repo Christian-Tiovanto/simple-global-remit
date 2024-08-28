@@ -1,6 +1,6 @@
 import { IsNumber, IsString } from 'class-validator';
 
-export class CreateUserNotificationDto {
+export class RegisterUserNotificationDto {
   @IsNumber()
   user_id: number;
 
