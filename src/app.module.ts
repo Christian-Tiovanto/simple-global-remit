@@ -24,6 +24,8 @@ import { Company } from './modules/company/model/company.entity';
 import { CompanyModule } from './modules/company/company.module';
 import { TransactionLogModule } from './modules/transaction-log/transaction-log.module';
 import { TransactionLog } from './modules/transaction-log/models/transaction-log.entity';
+import { UserNotificationModule } from './modules/user-notification-token/user-notification.module';
+import { UserNotification } from './modules/user-notification-token/models/user-notification.entity';
 
 @Module({
   providers: [
@@ -50,6 +52,7 @@ import { TransactionLog } from './modules/transaction-log/models/transaction-log
         DestinationFee,
         Company,
         TransactionLog,
+        UserNotification,
       ],
       synchronize: true,
     }),
@@ -63,6 +66,7 @@ import { TransactionLog } from './modules/transaction-log/models/transaction-log
     DestinationFeeModule,
     CompanyModule,
     TransactionLogModule,
+    UserNotificationModule,
   ],
 })
 export class AppModule {}

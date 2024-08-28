@@ -11,3 +11,4 @@ services:
     ports:
       - ${DB_PORT}:${DB_PORT}
     restart: always
+    tty: true  
