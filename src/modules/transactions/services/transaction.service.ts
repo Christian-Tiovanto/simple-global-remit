@@ -12,6 +12,11 @@ import { UpdateTransactionStatusDto } from '../dtos/update-transaction-status.dt
 import { generateSerial } from 'src/utils/generate-transaction-id';
 import { TransactionLogService } from 'src/modules/transaction-log/services/transaction-log.service';
 import { ValidationError } from 'src/exceptions/validation-error.exception';
+import { UserNotificationService } from 'src/modules/user-notification-token/services/user-notification.service';
+import { User } from 'src/modules/user/models/user.entity';
+import { TokenMessage } from 'firebase-admin/messaging';
+import { UserNotification } from 'src/modules/user-notification-token/models/user-notification.entity';
+import { UserService } from 'src/modules/user/services/user.service';
 
 @Injectable()
 export class TransactionService {
@@ -19,6 +24,8 @@ export class TransactionService {
     @InjectRepository(Transaction) private transactionRepository: Repository<Transaction>,
     private exchangeService: ExchangeRateService,
     private transactionLogService: TransactionLogService,
+    private userNotificationService: UserNotificationService,
+    private userService: UserService,
   ) {}
 
   async getUserTransaction(id: number, status: TransactionStatus) {
@@ -34,9 +41,10 @@ export class TransactionService {
     }
   }
   async createTransaction(createTransactionDto: CreateTransactionDto, userId: number) {
-    const amount = await this.transactionRepository.manager.transaction(async (entityManager: EntityManager) => {
-      const { currency, amount, to_account, sender_name, destination_country, receiver_name, fee, rate } =
-        createTransactionDto;
+    const { currency, amount, to_account, sender_name, destination_country, receiver_name, fee, rate } =
+      createTransactionDto;
+    const user = await this.userService.getUserbyId(userId);
+    const transaction = await this.transactionRepository.manager.transaction(async (entityManager: EntityManager) => {
       const formattedAmount = await this.calculateAmount(
         {
           toCurrency: currency,
@@ -46,7 +54,7 @@ export class TransactionService {
       );
       await this.validateRateFromFE(currency, destination_country, rate);
       const transaction = await entityManager.create(Transaction, {
-        user: { id: userId },
+        user,
         to_account: to_account,
         sender_name,
         payment_price: Number((amount + fee).toFixed(2)),
@@ -64,7 +72,8 @@ export class TransactionService {
       transaction.user = undefined;
       return transaction;
     });
-    return amount;
+    await this.sendNotificationToUser(user, transaction);
+    return transaction;
   }
 
   private async validateRateFromFE(currency: string, destination_country: string, rate: number) {
@@ -92,36 +101,75 @@ export class TransactionService {
 
   async updatePaidTransactionStatus(
     updatePaidTransactionStatusDto: UpdatePaidTransactionStatusDto,
-    file: Express.Multer.File['path'],
+    filePath: Express.Multer.File['path'],
     userId: number,
   ) {
-    const { id } = updatePaidTransactionStatusDto;
-    const transaction = await this.transactionRepository.findOne({ where: { id } });
-    if (!transaction) throw new BadRequestException('there is no transaction with that id');
-    const status = TransactionStatus.ONGOING;
+    const transaction = await this.getTransactionById(updatePaidTransactionStatusDto.id);
     const previous_state = transaction.status;
-    console.log(previous_state);
-    transaction.status = status;
-    transaction.photo_path = file;
+
+    this.updateTransactionStatusAndPhoto(transaction, filePath);
+
     await this.transactionRepository.save(transaction);
     await this.transactionLogService.createTransactionLog(transaction, previous_state, userId);
+
+    this.getUserAndSendNotificationToUser(userId, transaction);
     return transaction;
   }
+  private updateTransactionStatusAndPhoto(transaction: Transaction, filePath: string) {
+    const status = TransactionStatus.ONGOING;
+    transaction.status = status;
+    transaction.photo_path = filePath;
+  }
+
   async updateTransactionStatus(updateTransactionStatusDto: UpdateTransactionStatusDto, userId: number) {
     const { id, status } = updateTransactionStatusDto;
-    const transaction = await this.transactionRepository.findOne({ where: { id } });
-    if (!transaction) throw new BadRequestException('there is no transaction with that id');
+    const transaction = await this.getTransactionById(id);
     const previous_state = transaction.status;
     transaction.status = status;
     await this.transactionRepository.save(transaction);
     await this.transactionLogService.createTransactionLog(transaction, previous_state, userId);
+    this.getUserAndSendNotificationToUser(userId, transaction);
+
     return transaction;
+  }
+  private async getUserAndSendNotificationToUser(userId: number, transaction: Transaction) {
+    const user = await this.userService.getUserbyId(userId);
+    const userNotificationToken = await this.getUserNotificationToken(user);
+    const message = this.buildTransactionMessage(userNotificationToken.token, transaction);
+    this.userNotificationService.sendNotificationToUser(message);
+  }
+  private async sendNotificationToUser(user: User, transaction: Transaction) {
+    const userNotificationToken = await this.getUserNotificationToken(user);
+    const message = this.buildTransactionMessage(userNotificationToken.token, transaction);
+    this.userNotificationService.sendNotificationToUser(message);
+  }
+
+  private async getUserNotificationToken(user: User): Promise<UserNotification> {
+    return this.userNotificationService.getUserNotificationToken(user);
+  }
+
+  private buildTransactionMessage(token: string, transaction: Transaction): TokenMessage {
+    return {
+      token: token,
+      notification: {
+        title: 'Successfully created transaction',
+        body: `Succesfully Create Transaction to ${transaction.receiver_name} with total amount ${transaction.amount_received}`,
+      },
+      data: {
+        transaction_id: transaction.id.toString(),
+        previous_status: '',
+        current_status: 'pending',
+      },
+    };
   }
 
   async getTransactionPhoto(id: number) {
-    const transaction = await this.transactionRepository.findOne({ where: { id } });
-    if (!transaction) throw new BadRequestException('there is no transaction with that id');
+    const transaction = await this.getTransactionById(id);
     return transaction.photo_path;
+  }
+
+  private async getTransactionById(id: number) {
+    return await this.transactionRepository.findOne({ where: { id } });
   }
 
   async getAllTransactionByStatus(status: TransactionStatus) {

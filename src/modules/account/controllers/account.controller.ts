@@ -35,7 +35,7 @@ export class AccountController {
 
   @ApiOperation({ summary: 'use this API to get user account. Roles[admin,client]' })
   @ApiOkResponse({ schema: SwaggerResponseWrapper.createResponse(GetAccountResponse) })
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Get('me')
   async getUserAccount(@Request() req) {
     return await this.accountService.getUserAccount(req.user.id);

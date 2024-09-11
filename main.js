@@ -1,10 +1,44 @@
-const target = { a: 1, b: 2 };
-const source = { b: 4, c: 5 };
+fetchData().then((data) => console.log(data));
 
-const returnedTarget = Object.assign(target, 'source');
+setTimeout(() => {
+  console.log('async');
+});
+async function tes() {
+  const result = await tes3();
+  console.log(result);
+  console.log('aa');
+  return 'ea';
+}
+async function tes2() {
+  console.log('tes2');
 
-console.log(target);
-// Expected output: Object { a: 1, b: 4, c: 5 }
+  const result = tes();
+  console.log(result);
+  console.log('stelah tes 2');
+}
+async function tes3() {
+  console.log('tes3');
+  for (let i = 0; i < 10; i++) {
+    console.log(i);
+  }
+  return 'tes3 akhir';
+}
+console.log('awal');
+tes2();
+console.log('akhir');
 
-console.log(returnedTarget === target);
-// Expected output: true
+function fetchData() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      console.log('fetch Data');
+      resolve('Data fetched');
+    }, 0);
+  });
+}
+function ta() {
+  return {
+    ea: 'tes',
+  };
+}
+const coba = { ta: ta() };
+console.log(coba);
