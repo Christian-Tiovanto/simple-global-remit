@@ -10,5 +10,5 @@ services:
       POSTGRES_DB: ${DB_NAME}
     ports:
       - ${DB_PORT}:${DB_PORT}
-    tty: true
     restart: always
+    tty: true  
