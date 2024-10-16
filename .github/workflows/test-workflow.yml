@@ -16,4 +16,10 @@ jobs:
       - run: echo "baba"
         name: 2
       - run: node main.js
-      - run: echo $GITHUB_REF_TYPE
+      - run: |
+          REF_TYPE=${{ github.ref_type }}
+          if [[ "$REF_TYPE" != "tag" ]]; then
+            echo "Workflow is not run on tag."
+            exit 1
+          fi
+          echo "Workflow is running of tag"
