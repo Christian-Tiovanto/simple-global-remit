@@ -12,3 +12,5 @@ jobs:
         run: |
           echo "asem"
         name: eaaaa
+      - run: echo "baba"
+        name: 2
