@@ -14,3 +14,4 @@ jobs:
         name: eaaaa
       - run: echo "baba"
         name: 2
+      - run: node main.js
