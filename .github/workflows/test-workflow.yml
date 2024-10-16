@@ -1,10 +1,13 @@
 name: GitHub Workflow Demo
-
 on:
-  issues:
-    types:
-      - opened
-
+  workflow_dispatch:
+    inputs:
+      chosen-os:
+        required: true
+        type: choice
+        options:
+        - Ubuntu
+        - macOS
 jobs:
   label_issue:
     runs-on: ubuntu-latest
