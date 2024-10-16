@@ -1,7 +1,9 @@
 name: GitHub Workflow Demo
 
 on:
-  workflow_dispatch:
+  issues:
+    types:
+      - opened
 
 jobs:
   label_issue:
